@@ -1,0 +1,36 @@
+{
+  "id": "row_row_row_your_boat",
+  "title": "Row, Row, Row Your Boat",
+  "difficulty": 1,
+  "time_signature": "6/8",
+  "melody": [
+    { "key": "C4", "duration": 1.5 },
+    { "key": "C4", "duration": 1.5 },
+
+    { "key": "C4", "duration": 1 },
+    { "key": "D4", "duration": 1 },
+    { "key": "E4", "duration": 1.5 },
+
+    { "key": "E4", "duration": 1 },
+    { "key": "D4", "duration": 1 },
+    { "key": "E4", "duration": 1 },
+    { "key": "F4", "duration": 1 },
+    { "key": "G4", "duration": 3.0 },
+
+    { "key": "C5", "duration": 1.5 },
+    { "key": "C5", "duration": 1.5 },
+
+    { "key": "C5", "duration": 1 },
+    { "key": "G4", "duration": 0.5 },
+    { "key": "G4", "duration": 1 },
+    { "key": "E4", "duration": 1 },
+
+    { "key": "C4", "duration": 1.5 },
+
+    { "key": "G4", "duration": 1 },
+    { "key": "F4", "duration": 1 },
+    { "key": "E4", "duration": 1 },
+    { "key": "D4", "duration": 1 },
+    { "key": "C4", "duration": 3.0 }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "in_the_end_intro",
+  "title": "Linkin Park - In the End (Intro)",
+  "difficulty": 2,
+  "melody": [
+    { "key": "Dsharp4", "duration": 1.0 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Fsharp4", "duration": 1.0 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.5 },
+    { "key": "Fsharp4", "duration": 0.75 },
+
+    { "key": "Dsharp4", "duration": 1.0 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Fsharp4", "duration": 1.0 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.5 },
+    { "key": "Fsharp4", "duration": 0.75 },
+
+    { "key": "Dsharp4", "duration": 1.0 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Fsharp4", "duration": 1.0 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.5 },
+    { "key": "Fsharp4", "duration": 0.75 },
+
+    { "key": "Dsharp4", "duration": 1.0 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Asharp4", "duration": 0.75 },
+    { "key": "Fsharp4", "duration": 1.0 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.75 },
+    { "key": "F4", "duration": 0.5 },
+    { "key": "Fsharp4", "duration": 0.75 },
+
+    { "key": "Dsharp4", "duration": 2.0 }
+  ]
+}
