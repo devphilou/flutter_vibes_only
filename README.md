@@ -50,8 +50,9 @@ To go beyond the basics:
 
 The prize will be randomly assigned in a raffle. To qualify, you need to fill in the short form and share a post on **ANY social media**:
 
-### What to share: ###
-What you've built during the workshop (live link OR short video), tagging the conference name **Flutter & Friends** @FlutterNFriends.
+### What to share: 
+What you built during the workshop (live link or short video). Use the hashtag 
+**#FlutterVibesOnlyFlutterAndFriends** so we can find your post easily.
 
 Tagging us is not required, but if you want, you can tag us with X handles **@ivannahere** & **@esratech** or LinkedIn handles [evanca](https://linkedin.com/in/evanca) & [esratech](https://linkedin.com/in/esratech).
 
