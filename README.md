@@ -48,7 +48,7 @@ To go beyond the basics:
 
 ## 🎁 Raffle Prize Details
 
-The prize will be randomly assigned in a raffle. To qualify, you need to fill in the short form and share a post on **ANY social media**:
+The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**:
 
 ### What to share: 
 What you built during the workshop (live link or short video). Use the hashtag 
@@ -62,11 +62,9 @@ Optionally, add some of your thoughts on the current state of Flutter vibe codin
 
 We advise sharing a **live app link or a video**. In case you absolutely cannot provide these, add at least some image screenshots.
 
-You can submit up until **30 minutes after the workshop is over**. For example, if the workshop ends at **10:00 AM**, you can still submit your app until **10:30 AM**.
+You can submit up until **30 minutes after the workshop is over**. For example, if the workshop ends at **16:30 AM**, you can still submit your app until **17:00 AM**.
 
 As long as your app qualifies for the minimal requirements, you are participating in the raffle! Depending on other submissions, we might also include some apps that are not fully finished, so we advise literally anyone to share what you've built—even if you doubt that your app qualifies.
-
-We will collect all submissions via **Google Form**—please share the link to your social media post **HERE**.
 
 ---
 
