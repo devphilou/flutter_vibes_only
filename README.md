@@ -48,11 +48,10 @@ To go beyond the basics:
 
 ## 🎁 Raffle Prize Details
 
-The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**:
+The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**. We will collect all submissions via **Google Form** — please share the link to your social media post [HERE](https://forms.gle/vha2zsBGCTZY5DLb9)!
 
 ### What to share: 
-What you built during the workshop (live link or short video). Use the hashtag 
-**#FlutterVibesOnlyFlutterAndFriends** so we can find your post easily.
+Share what you built during the workshop (a live link or a short video). Use the hashtag **#FlutterVibesOnly** and tag Flutter and Friends (for example, on X: @flutternfriends).
 
 Tagging us is not required, but if you want, you can tag us with X handles **@ivannahere** & **@esratech** or LinkedIn handles [evanca](https://linkedin.com/in/evanca) & [esratech](https://linkedin.com/in/esratech).
 
