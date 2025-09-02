@@ -6,9 +6,9 @@ Create a fun, educational piano game experience using Flutter.
 
 ## ⚡ Resources to Save You Time
 
-- You can find note files (simple, generated with Python) in the [`/resources/audio`](./resources/audio) folder
-- You can find some starter song JSON files in the [`/resources/songs`](./resources/songs) folder, or create your own
-- You can also use assets from the [`/resources/assets`](./resources/assets) folder 
+- You can find note files (simple, generated with Python) in the [`/resources/audio`](https://github.com/evanca/flutter_vibes_only/tree/flutter_and_friends_2025/resources/audio) folder
+- You can find some starter song JSON files in the [`/resources/songs`](https://github.com/evanca/flutter_vibes_only/tree/flutter_and_friends_2025/resources/songs) folder, or create your own
+- You can also use assets from the [`/resources/assets`](https://github.com/evanca/flutter_vibes_only/tree/flutter_and_friends_2025/resources/assets) folder
 
 ---
 
