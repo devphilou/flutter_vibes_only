@@ -1,56 +1,45 @@
-# 🎹 Flutter & Friends Piano Game – Hackathon Requirements
+# 🎨 Paint Vibes Only – Hackathon Requirements
 
-Create a fun, educational piano game experience using Flutter.
+Create a fun and creative drawing app using Flutter.
 
 ---
 
 ## ⚡ Resources to Save You Time
 
-- You can find note files (simple, generated with Python) in the [`/resources/audio`](https://github.com/evanca/flutter_vibes_only/tree/flutter_and_friends_2025/resources/audio) folder
-- You can find some starter song JSON files in the [`/resources/songs`](https://github.com/evanca/flutter_vibes_only/tree/flutter_and_friends_2025/resources/songs) folder, or create your own
-- You can also use assets from the [`/resources/assets`](https://github.com/evanca/flutter_vibes_only/tree/flutter_and_friends_2025/resources/assets) folder
+- You can find tool icons for all painting features in the [`/assets`](https://github.com/evanca/flutter_vibes_only/tree/main/assets) folder
+- You can find ready-made coloring book images in the [`/assets/coloring`](https://github.com/evanca/flutter_vibes_only/tree/main/assets/coloring) folder
+
+These asset images are totally optional. Feel free to use them if you’d like.
 
 ---
 
 ## ✅ Minimal Requirements
 
-To qualify for the hackathon, your game must include:
+To qualify, the app must include:
 
-- Start screen
-- Song selection (at least 1 song)
-- "One Note at a Time" mode
-- End level UI
+Drawing screen with:
+  - A basic drawing tool (pencil or brush)
+  - Color selection (predefined colors)
+  - Clear canvas option
+  - Save option (file export or in-app gallery)
+  - Undo/redo (at least one step back/forward)
 
 ---
 
 ## 🚀 Advanced Requirements
 
-To go beyond the basics:
+To go beyond the basics, the app can include:
 
-- Start screen
-- Song selection with multiple songs and difficulty ratings
-- Game modes:
-  - Listen
-  - One Note at a Time
-  - Challenge
-- Points or stars system (for all modes except Listen)
-- End mode / end level UI
-- Settings screen
-- Leaderboard
-- Extra features of your choice (e.g. ai-generated levels, custom songs, etc.)
-
----
-
-## 🎧 Game Modes – Player Experience
-
-### 👂 Listen Mode
-> _“I get to hear the full song while watching the piano keys light up. I don’t need to tap anything yet — just listen and follow along.”_
-
-### 🎯 One Note at a Time Mode
-> _“The game waits for me to press each correct key. I play one note at a time, going at my own pace. Each note I play makes sound.”_
-
-### ⭐ Challenge Mode
-> _“I try to play the song from memory without hints. I earn points based on how accurate and on-time I am.”_
+- Start screen with navigation
+- Drawing mode enhancements:
+  - Multiple tools (pencil, brush, eraser, bucket, eyedropper)
+  - Shape tools (circle, rectangle, line, wave)
+  - Brush size slider and advanced settings
+  - Custom color picker and recent colors
+- Coloring mode:
+  - Gallery of coloring pages (with progress indicators)
+  - Saved progress per page
+- Recent drawings gallery
 
 ---
 
@@ -59,19 +48,19 @@ To go beyond the basics:
 The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**. We will collect all submissions via **Google Form** — please share the link to your social media post [HERE](https://forms.gle/vha2zsBGCTZY5DLb9)!
 
 ### What to share: 
-Share what you built during the workshop (a live link or a short video). Use the hashtag **#FlutterVibesOnly** and tag Flutter and Friends (for example, on X: @flutternfriends).
+Share what you built during the workshop (a live link or a short video). Use the hashtag **#FlutterVibesOnly** and tag Fluttercon (for example, on X: @FlutterconWorld).
 
 Tagging us is not required, but if you want, you can tag us with X handles **@ivannahere** & **@esratech** or LinkedIn handles [evanca](https://linkedin.com/in/evanca) & [esratech](https://linkedin.com/in/esratech).
 
-Optionally, add some of your thoughts on the current state of Flutter vibe coding based on this challenge.
+Optionally, share the model name you used (e.g., Gemini) and your thoughts on the current state of Flutter vibe coding based on today’s experiment.
 
 ### 📌 Submission Requirements
 
 We advise sharing a **live app link or a video**. In case you absolutely cannot provide these, add at least some image screenshots.
 
-You can submit up until **30 minutes after the workshop is over**. For example, if the workshop ends at **16:30 AM**, you can still submit your app until **17:00 AM**.
+You can submit up until **30 minutes after the workshop is over**. For example, if the workshop ends at **17:20 AM**, you can still submit your app until **17:50 AM**.
 
-As long as your app qualifies for the minimal requirements, you are participating in the raffle! Depending on other submissions, we might also include some apps that are not fully finished, so we advise literally anyone to share what you've built—even if you doubt that your app qualifies.
+As long as your app meets the minimal requirements, you’ll be entered into the raffle! Depending on other submissions, we may also include apps that aren’t fully finished, so we encourage everyone to share what you’ve built—even if you’re not sure it qualifies (yes, even a red error screen counts, as it shows how far your AI assistant got with the task — just be sure to mention which model failed for you). 
 
 ---
 
@@ -115,3 +104,9 @@ Public hackathon Wi-Fi may be limited if many people upload files at once.
 ## 📸 Media Sharing
 
 Workshop organisers reserve the right to share **screenshots, clips, or videos** of submitted apps on social media and community channels to highlight your work. Your privacy preferences will be respected.
+
+---
+
+## Attribution
+
+All asset images included in this repository were created by Ivanna Kaceviča. You are welcome to use them for hackathon and project demo purposes!  
