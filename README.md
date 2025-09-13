@@ -45,7 +45,7 @@ To go beyond the basics, the app can include:
 
 ## 🎁 Raffle Prize Details
 
-The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**. We will collect all submissions via **Google Form** — please share the link to your social media post [HERE](https://forms.gle/vha2zsBGCTZY5DLb9)!
+The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**. We will collect all submissions via **Google Form** — please share the link to your social media post [HERE](https://forms.gle/tvzQswk6524W2zA37)!
 
 ### What to share: 
 Share what you built during the workshop (a live link or a short video). Use the hashtag **#FlutterVibesOnly** and tag Fluttercon (for example, on X: @FlutterconWorld).
