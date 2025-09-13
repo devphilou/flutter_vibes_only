@@ -6,8 +6,8 @@ Create a fun and creative drawing app using Flutter.
 
 ## ⚡ Resources to Save You Time
 
-- You can find tool icons for all painting features in the [`/assets`](https://github.com/evanca/flutter_vibes_only/tree/main/assets) folder
-- You can find ready-made coloring book images in the [`/assets/coloring`](https://github.com/evanca/flutter_vibes_only/tree/main/assets/coloring) folder
+- You can find tool icons for all painting features in the [`resources/assets`](https://github.com/evanca/flutter_vibes_only/tree/fluttercon_europe_2025/resources/assets) folder
+- You can find ready-made coloring book images in the [`resources/assets/coloring`](https://github.com/evanca/flutter_vibes_only/tree/fluttercon_europe_2025/resources/assets/coloring) folder
 
 These asset images are totally optional. Feel free to use them if you’d like.
 
