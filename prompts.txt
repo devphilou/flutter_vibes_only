@@ -26,3 +26,5 @@ Like you derived before the product requirements document (PRD.md) for an MVP fo
 For that, extend the PRD.md to meet the advanced requirements mentioned in the README.
 ---
 Yes, create a companion ADVANCED_PLAN.md for the implementation plan
+---
+Yes, introduce go_router in A1

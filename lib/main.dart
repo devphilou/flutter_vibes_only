@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
-import 'state/drawing_state.dart';
+import 'routing/app_router.dart';
 import 'strings/app_strings.dart';
-import 'widgets/drawing_canvas.dart';
-import 'widgets/toolbar.dart';
 
 /// Entry point for the Paint Vibes Only app.
 void main() {
@@ -21,8 +19,16 @@ class PaintVibesApp extends StatefulWidget {
 
 class _PaintVibesAppState extends State<PaintVibesApp> {
   ThemeMode _mode = ThemeMode.system;
+  late final GoRouter _router;
+  final _navKey = GlobalKey<NavigatorState>();
 
-  void _toggleTheme() {
+  @override
+  void initState() {
+    super.initState();
+    _router = createRouter(navigatorKey: _navKey);
+  }
+
+  void _cycleTheme() {
     setState(() {
       _mode = switch (_mode) {
         ThemeMode.system => ThemeMode.light,
@@ -32,171 +38,58 @@ class _PaintVibesAppState extends State<PaintVibesApp> {
     });
   }
 
-  String _themeLabel() => switch (_mode) {
-        ThemeMode.system => AppStrings.themeSystem,
-        ThemeMode.light => AppStrings.themeLight,
-        ThemeMode.dark => AppStrings.themeDark,
-      };
-
-  IconData _themeIcon() => switch (_mode) {
-        ThemeMode.system => Icons.brightness_auto,
-        ThemeMode.light => Icons.light_mode,
-        ThemeMode.dark => Icons.dark_mode,
-      };
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppStrings.appTitle,
-      debugShowCheckedModeBanner: false,
-      themeMode: _mode,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple, brightness: Brightness.light),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple, brightness: Brightness.dark),
-        useMaterial3: true,
-      ),
-      home: _DrawingScreen(
-        onToggleTheme: _toggleTheme,
-        themeIcon: _themeIcon(),
-        themeLabel: _themeLabel(),
+    return _ThemeController(
+      mode: _mode,
+      cycle: _cycleTheme,
+      child: MaterialApp.router(
+        title: AppStrings.appTitle,
+        debugShowCheckedModeBanner: false,
+        themeMode: _mode,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple, brightness: Brightness.light),
+          useMaterial3: true,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple, brightness: Brightness.dark),
+          useMaterial3: true,
+        ),
+        routerConfig: _router,
+        builder: (context, child) {
+          final controller = _ThemeController.of(context);
+          return Scaffold(
+            body: child,
+            floatingActionButton: FloatingActionButton(
+              tooltip: 'Cycle Theme',
+              onPressed: controller.cycle,
+              child: const Icon(Icons.brightness_6),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-/// Temporary home screen hosting the drawing canvas (Phase P0).
-class _DrawingScreen extends StatefulWidget {
-  const _DrawingScreen({
-    required this.onToggleTheme,
-    required this.themeIcon,
-    required this.themeLabel,
+/// Inherited controller giving descendants access to theme toggling while a
+/// more persistent settings system is prepared in A1 persistence work.
+class _ThemeController extends InheritedWidget {
+  const _ThemeController({
+    required this.mode,
+    required this.cycle,
+    required super.child,
   });
 
-  final VoidCallback onToggleTheme;
-  final IconData themeIcon;
-  final String themeLabel;
+  final ThemeMode mode;
+  final VoidCallback cycle;
+
+  static _ThemeController of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_ThemeController>()!;
 
   @override
-  State<_DrawingScreen> createState() => _DrawingScreenState();
-}
-
-class _DrawingScreenState extends State<_DrawingScreen> {
-  late final DrawingState _drawingState;
-  final GlobalKey _canvasKey = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    _drawingState = DrawingState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.appTitle),
-        actions: [
-          IconButton(
-            tooltip: '${AppStrings.themeToggle}: ${widget.themeLabel}',
-            onPressed: widget.onToggleTheme,
-            icon: Icon(widget.themeIcon, semanticLabel: AppStrings.themeToggle),
-          ),
-        ],
-      ),
-      body: Shortcuts(
-        shortcuts: {
-          LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyZ):
-              const _UndoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ):
-              const _UndoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.shift,
-              LogicalKeyboardKey.keyZ): const _RedoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.shift,
-              LogicalKeyboardKey.keyZ): const _RedoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY):
-              const _RedoIntent(),
-        },
-        child: Actions(
-          actions: {
-            _UndoIntent: CallbackAction<_UndoIntent>(
-              onInvoke: (intent) {
-                if (_drawingState.canUndo) _drawingState.undo();
-                return null;
-              },
-            ),
-            _RedoIntent: CallbackAction<_RedoIntent>(
-              onInvoke: (intent) {
-                if (_drawingState.canRedo) _drawingState.redo();
-                return null;
-              },
-            ),
-          },
-          child: Focus(
-            autofocus: true,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DrawingToolbar(
-                          state: _drawingState,
-                          canvasBoundaryKey: _canvasKey,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              minWidth: 300,
-                              minHeight: 300,
-                              maxWidth: 1200,
-                            ),
-                            child: AspectRatio(
-                              aspectRatio: 4 / 3,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  border: Border.all(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outlineVariant,
-                                  ),
-                                ),
-                                child: DrawingCanvas(
-                                  state: _drawingState,
-                                  boundaryKey: _canvasKey,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _UndoIntent extends Intent {
-  const _UndoIntent();
-}
-
-class _RedoIntent extends Intent {
-  const _RedoIntent();
+  bool updateShouldNotify(covariant _ThemeController oldWidget) =>
+      oldWidget.mode != mode;
 }
