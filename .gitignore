@@ -1,1 +1,4 @@
 /.idea/
+.dart_tool/
+.vscode/
+build/
