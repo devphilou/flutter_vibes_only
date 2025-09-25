@@ -108,6 +108,16 @@ class DrawingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clears all strokes and history (FR-17).
+  void clear() {
+    if (_strokes.isEmpty && _redo.isEmpty && _inProgress == null) return;
+    _strokes.clear();
+    _redo.clear();
+    _currentPoints.clear();
+    _inProgress = null;
+    notifyListeners();
+  }
+
   /// Restores the most recently undone stroke (FR-07).
   void redo() {
     if (!canRedo) return;

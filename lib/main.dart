@@ -37,6 +37,7 @@ class _DrawingScreen extends StatefulWidget {
 
 class _DrawingScreenState extends State<_DrawingScreen> {
   late final DrawingState _drawingState;
+  final GlobalKey _canvasKey = GlobalKey();
 
   @override
   void initState() {
@@ -57,7 +58,10 @@ class _DrawingScreenState extends State<_DrawingScreen> {
               children: [
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DrawingToolbar(state: _drawingState),
+                  child: DrawingToolbar(
+                    state: _drawingState,
+                    canvasBoundaryKey: _canvasKey,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Expanded(
@@ -78,7 +82,10 @@ class _DrawingScreenState extends State<_DrawingScreen> {
                                   Theme.of(context).colorScheme.outlineVariant,
                             ),
                           ),
-                          child: DrawingCanvas(state: _drawingState),
+                          child: DrawingCanvas(
+                            state: _drawingState,
+                            boundaryKey: _canvasKey,
+                          ),
                         ),
                       ),
                     ),

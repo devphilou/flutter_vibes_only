@@ -14,3 +14,5 @@ Alright, proceed with the next step of the plan
 ---
 Perfect, color palette and stroke width selector are working.
 Go ahead with Phase P2 of the plan.
+---
+Go ahead with Phase P3 (export & clear).

@@ -5,9 +5,14 @@ import '../state/drawing_state.dart';
 
 /// Widget capturing pointer gestures and delegating rendering to [StrokesPainter].
 class DrawingCanvas extends StatelessWidget {
-  const DrawingCanvas({super.key, required this.state});
+  const DrawingCanvas({
+    super.key,
+    required this.state,
+    required this.boundaryKey,
+  });
 
   final DrawingState state;
+  final GlobalKey boundaryKey;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +34,7 @@ class DrawingCanvas extends StatelessWidget {
           animation: state,
           builder: (context, _) {
             return RepaintBoundary(
+              key: boundaryKey,
               child: CustomPaint(
                 painter: StrokesPainter(
                   strokes: state.strokes,
