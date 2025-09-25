@@ -9,6 +9,7 @@ import '../utils/date_time_format.dart';
 import 'color_palette.dart';
 import 'confirm_clear_dialog.dart';
 import 'stroke_width_selector.dart';
+import 'stroke_width_slider.dart';
 
 /// Toolbar for selecting color & stroke width (Phase P1). Undo/Redo/Export will
 /// be added in later phases.
@@ -56,6 +57,11 @@ class DrawingToolbar extends StatelessWidget {
               StrokeWidthSelector(
                 widths: _widths,
                 selectedWidth: state.currentWidth,
+                onChanged: state.setWidth,
+              ),
+              // Stretch width slider (optional advanced control)
+              StrokeWidthSlider(
+                value: state.currentWidth,
                 onChanged: state.setWidth,
               ),
               Row(
@@ -128,6 +134,9 @@ class DrawingToolbar extends StatelessWidget {
                                     ),
                                   );
                                 }
+                                // Logging (stretch)
+                                // ignore: use_build_context_synchronously
+                                debugPrint('export_success $filename');
                               } catch (e) {
                                 if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(

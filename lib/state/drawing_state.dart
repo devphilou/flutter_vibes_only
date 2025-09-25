@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,14 @@ class DrawingState extends ChangeNotifier {
   // Active drawing attributes (FR-08, FR-10)
   Color _currentColor = const Color(0xFF000000);
   double _currentWidth = 2.0;
+  // Stretch instrumentation counters
+  int _strokeCount = 0;
+  int _undoCount = 0;
+  int _redoCount = 0;
+
+  int get strokeCount => _strokeCount;
+  int get undoCount => _undoCount;
+  int get redoCount => _redoCount;
 
   Color get currentColor => _currentColor;
   double get currentWidth => _currentWidth;
@@ -98,6 +107,8 @@ class DrawingState extends ChangeNotifier {
     _redo.clear();
     _inProgress = null;
     _currentPoints.clear();
+    _strokeCount++;
+    dev.log('stroke_added total=$_strokeCount', name: 'drawing');
     notifyListeners();
   }
 
@@ -105,6 +116,8 @@ class DrawingState extends ChangeNotifier {
   void undo() {
     if (!canUndo) return;
     _redo.add(_strokes.removeLast());
+    _undoCount++;
+    dev.log('undo count=$_undoCount', name: 'drawing');
     notifyListeners();
   }
 
@@ -115,6 +128,9 @@ class DrawingState extends ChangeNotifier {
     _redo.clear();
     _currentPoints.clear();
     _inProgress = null;
+    dev.log(
+        'clear_all strokesCleared; totals strokes=$_strokeCount undo=$_undoCount redo=$_redoCount',
+        name: 'drawing');
     notifyListeners();
   }
 
@@ -122,6 +138,8 @@ class DrawingState extends ChangeNotifier {
   void redo() {
     if (!canRedo) return;
     _strokes.add(_redo.removeLast());
+    _redoCount++;
+    dev.log('redo count=$_redoCount', name: 'drawing');
     notifyListeners();
   }
 
@@ -129,6 +147,8 @@ class DrawingState extends ChangeNotifier {
   void setColor(Color color) {
     if (color == _currentColor) return;
     _currentColor = color;
+    dev.log('color_changed value=${color.value.toRadixString(16)}',
+        name: 'drawing');
     notifyListeners();
   }
 
@@ -136,6 +156,7 @@ class DrawingState extends ChangeNotifier {
   void setWidth(double width) {
     if (width == _currentWidth) return;
     _currentWidth = width;
+    dev.log('width_changed value=$width', name: 'drawing');
     notifyListeners();
   }
 }

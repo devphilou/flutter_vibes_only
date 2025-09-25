@@ -19,4 +19,16 @@ class AppStrings {
   // Feedback
   static const exportFailed = 'Export failed';
   static const savedPrefix = 'Saved';
+  // Stretch: theming
+  static const themeToggle = 'Toggle theme';
+  static const themeSystem = 'System theme';
+  static const themeLight = 'Light theme';
+  static const themeDark = 'Dark theme';
+  // Stretch: width slider
+  static const widthSliderLabel = 'Stroke width slider';
+  // Shortcuts help (not displayed yet but reserved)
+  static const undoShortcutMac = 'Cmd+Z';
+  static const redoShortcutMac = 'Shift+Cmd+Z';
+  static const undoShortcutWin = 'Ctrl+Z';
+  static const redoShortcutWin = 'Shift+Ctrl+Z or Ctrl+Y';
 }
