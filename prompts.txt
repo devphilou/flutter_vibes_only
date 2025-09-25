@@ -2,3 +2,5 @@ Convert the attached rules.md file
 into a .github/copilot-instructions.md file for VS Code Copilot like described here: https://code.visualstudio.com/docs/copilot/customization/overview#_custom-instructions
 Make sure to use the styles required for a copilot-instructions.md file.
 
+We want to build a paint app for flutter web today. 
+Provide a product requirements document for a MVP and put it into a PRD.md
