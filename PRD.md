@@ -272,3 +272,206 @@ Prepared for: Flutter Web MVP build cycle
 Maintainer: (Add name)
 Date: 2025-09-25
 Version: 1.0.0-MVP
+
+---
+
+# Advanced Expansion (Post‑MVP Roadmap Extension)
+
+The following sections extend the MVP PRD to cover the "Advanced Requirements" listed in the repository `README.md`. These do not invalidate the MVP; they layer on top as Phase 2 (Advanced Release) objectives. All new functional requirements start at FR-32 to preserve historical numbering integrity.
+
+## 21. Additional Goals (Advanced Release)
+
+1. Provide a start/navigation screen that introduces modes (Free Draw, Coloring Pages, Gallery).
+2. Add multiple creative tools (brush variants, eraser, fill bucket, eyedropper) and shape tools (circle, rectangle, line, wave) for richer expression.
+3. Support a customizable color system: full color picker + recent colors.
+4. Introduce a Coloring Mode with predefined line-art pages and persistent per-page progress.
+5. Provide a Recent Drawings Gallery with local persistence (no cloud) and export/import within browser storage limits.
+6. Maintain performance and accessibility parity with the MVP despite added complexity.
+7. Establish a light-weight persistence layer (localStorage / IndexedDB) abstracted for future extensibility.
+
+## 22. Non‑Goals (Advanced Phase)
+
+- Real-time collaboration or multi-user editing.
+- Layer management UI (beyond implicit stroke ordering).
+- Vector boolean operations or complex path editing.
+- AI-assisted generation / content-aware fill.
+- Multi-document tabs beyond simple gallery items.
+- Server-side sync or user authentication.
+
+## 23. New / Extended Functional Requirements
+
+| ID    | Requirement                   | Description                                                                                                                                                                                                                 |
+| ----- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-32 | Start Screen & Navigation     | Landing screen with clear entry points: Free Draw, Coloring Mode, Gallery. Uses declarative navigation (e.g., `go_router` optional) while keeping dependency count minimal.                                                 |
+| FR-33 | Multiple Tools Core           | Extend `ToolType` enum: `pencil, brush, eraser, bucket, eyedropper`. UI toolbar segment for tool selection with semantic labels.                                                                                            |
+| FR-34 | Shape Tools                   | Add parametric shape creation: circle, rectangle, straight line, wave line. Preview (ghost) during pointer drag; commit stroke on release.                                                                                  |
+| FR-35 | Advanced Brush Settings       | Replace/augment width presets with slider (already implemented) + style variants (e.g., soft brush: alpha falloff; hard brush: solid). Future-ready structure without over-abstracting.                                     |
+| FR-36 | Custom Color Picker           | Integrate HSV/Material color picker; maintain a recents strip (max ~8). Persist current palette and recents locally.                                                                                                        |
+| FR-37 | Eyedropper Tool               | Allows sampling a color from existing content. Use stroke color metadata first; fallback (future) to pixel read via `toImage()` if necessary (performance caution).                                                         |
+| FR-38 | Eraser Tool                   | Implement via drawing with `BlendMode.clear` on a save layer or by adding an eraser stroke type rendered clearing pixels. Maintains undo/redo parity.                                                                       |
+| FR-39 | Fill Bucket Tool              | Region fill inside enclosed boundaries. MVP algorithm: flood fill on an offscreen snapshot; complexity constrained by size (abort or warn if > threshold). Persist as a rasterized stroke layer or convert to polygon path. |
+| FR-40 | Coloring Mode Gallery         | Grid of predefined line-art assets (from `resources/assets/coloring`). Selecting a page opens a drawing session with locked background image.                                                                               |
+| FR-41 | Coloring Progress Persistence | Persist per-page strokes separately; re-open shows prior progress. Provide reset option per page.                                                                                                                           |
+| FR-42 | Recent Drawings Gallery       | List of saved canvases (thumbnails). Each entry stores: id, timestamp, preview PNG (downscaled), stroke metadata. Supports open, duplicate, delete.                                                                         |
+| FR-43 | Local Persistence Layer       | Simple abstraction (e.g., `DrawingRepository`) using `shared_preferences` (small metadata) + IndexedDB/web file system for binary blobs (web). Fallback gracefully where unsupported.                                       |
+| FR-44 | Export Scaling Option         | Allow choosing 1x / 2x / 4x export scale before generating PNG. Default remains 1x. Warn if memory risk.                                                                                                                    |
+| FR-45 | Extended Shortcuts            | Single-key or modifier shortcuts: tool switching (e.g., B=brush, E=eraser), shape constraint (Shift=constrain proportions), numeric keys for width presets. Provide accessible help panel.                                  |
+| FR-46 | Undo Grouping                 | Complex operations (shape drag, bucket fill) register exactly one undo entry. Intermediate preview states not pushed to history.                                                                                            |
+| FR-47 | Performance Budget            | Maintain ≥ 55 FPS for typical scenarios (≤ 800 strokes, average 150 points) and avoid frame jank > 120 ms during fills or shape finalization (measure manually).                                                            |
+| FR-48 | Persistence Resilience        | Detect and handle corrupted stored data (skip entry, log warn, continue). Provide UI to clear all persisted drawings.                                                                                                       |
+| FR-49 | Theme Preference Persistence  | Store last selected theme mode locally; rehydrate on launch.                                                                                                                                                                |
+| FR-50 | Accessibility Expansion       | Semantic grouping for tools, shape previews announce “preview” vs “placed”, color picker labels, gallery items announce title + progress %.                                                                                 |
+| FR-51 | Gallery Thumbnails            | Generate and cache small preview images (e.g., 200px wide) asynchronously to keep UI responsive.                                                                                                                            |
+| FR-52 | Coloring Progress Indicators  | Each coloring page tile shows percent of non-transparent pixels vs baseline line-art mask (approximate metric).                                                                                                             |
+| FR-53 | Data Model Extensions         | Extend `Stroke` if needed (e.g., `ShapeMeta`, `isEraser`, `blendMode`). Preserve backward compatibility for previously stored JSON.                                                                                         |
+| FR-54 | Session Import (Optional)     | Allow importing a saved drawing JSON/PNG pair (local file). Not required for first advanced drop but design data model with this in mind.                                                                                   |
+
+## 24. Updated Architecture Considerations
+
+New logical modules (added only when implementing related features):
+
+```
+lib/
+  navigation/              // (Optional) route config if using go_router
+  repository/              // DrawingRepository (local persistence abstraction)
+  tools/                   // Tool strategy classes (brush, eraser, fill, eyedropper)
+  shapes/                  // Shape builders & preview logic
+  coloring/                // Coloring gallery + page controller
+  gallery/                 // Recent drawings list & thumbnail generation
+  services/fill_service.dart   // Flood fill algorithm (compute isolate if heavy)
+  services/thumbnail_service.dart // Offscreen render & scale down
+  widgets/ (new)
+    tool_selector.dart
+    shape_toolbar.dart
+    color_picker_panel.dart
+    gallery_grid.dart
+    coloring_page_tile.dart
+```
+
+Principles maintained: small focused widgets, composition over inheritance, minimal dependencies. Third‑party packages introduced only when SDK solutions are insufficient (e.g., a vetted color picker package if building from scratch would distract). Justify each addition in PRs.
+
+## 25. Data Model Evolution
+
+Extended `ToolType`:
+
+```
+enum ToolType { pencil, brush, eraser, bucket, eyedropper, shape }
+```
+
+Possible shape metadata adjunct:
+
+```
+class ShapeMeta {
+  final ShapeType type; // rectangle, circle, line, wave
+  final Offset start;
+  final Offset end;     // or control points
+  // Optional: path cached for performance
+}
+```
+
+Stroke extension options (add fields only when required):
+
+```
+class Stroke {
+  // ...existing fields
+  final ShapeMeta? shape;          // null for freehand
+  final bool isEraser;             // simplifies render branch
+  final BlendMode? blendMode;      // e.g., BlendMode.clear for eraser
+}
+```
+
+Persistence format should version entries (e.g., `{ "version": 2, "strokes": [...] }`). On load: if version missing assume 1 and migrate.
+
+## 26. Persistence Strategy
+
+Web target: IndexedDB (via `flutter_secure_storage` or custom JS interop if needed) for binary blobs (thumbnails, PNG exports). `shared_preferences` (or `localStorage`) for lightweight indexes (list of drawing IDs, metadata). Provide an interface:
+
+```
+abstract class DrawingRepository {
+  Future<List<DrawingSummary>> list();
+  Future<DrawingData?> load(String id);
+  Future<void> save(DrawingData data);
+  Future<void> delete(String id);
+  Future<void> clearAll();
+}
+```
+
+`DrawingSummary` holds id, timestamp, optional thumbnail bytes length, stroke count, maybe coloring page id.
+
+## 27. User Flows (Advanced)
+
+1. Launch → Start Screen → choose Free Draw → drawing screen (existing canvas + new tools).
+2. Launch → Start Screen → Coloring Mode → pick page → coloring session (background locked, strokes overlaid) → auto-save.
+3. Launch → Start Screen → Gallery → open existing drawing → continue editing or export.
+4. While drawing: switch tools (keyboard or toolbar), adjust settings, undo/redo groups, export at higher resolution.
+5. Eyedropper: user activates tool → taps canvas → active color updates and tool auto-switches back to previous drawing tool (optional ergonomic optimization).
+
+## 28. Updated Acceptance Criteria (Representative)
+
+| Story          | Criteria                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------- |
+| Start screen   | Displays navigation options; keyboard focus cycles; pressing Enter activates selection.                  |
+| Multi-tool     | Switching tools updates cursor/preview; strokes reflect correct behavior (eraser clears, bucket fills).  |
+| Shape tool     | Drag preview shown; releasing commits single undo entry. Cancel (Esc) aborts.                            |
+| Color picker   | Selecting a custom color adds to recent strip; recents persist across reload until cleared.              |
+| Gallery        | Shows saved drawings with thumbnails; opening loads strokes accurately. Delete updates list immediately. |
+| Coloring page  | Previously filled regions/strokes reappear; progress indicator (%) updates after stroke commit.          |
+| Eyedropper     | Sampling updates active color; accessibility label announces new color.                                  |
+| Export scaling | Choosing 2x or 4x yields proportionally larger PNG dimensions.                                           |
+| Performance    | Rapid tool switching & drawing does not cause frame drops below target threshold in manual test.         |
+
+## 29. Performance & Risk Mitigation (Advanced)
+
+| Risk                                 | Mitigation                                                                    |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| Flood fill O(N) on large areas       | Tile-based or early abort threshold; run in isolate using `compute()`.        |
+| Excess memory (thumbnails & strokes) | Downscale thumbnails to fixed max dimension; prune oldest recents if > quota. |
+| Eyedropper latency (pixel read)      | Prefer stroke color metadata cache; only render-to-image when unavoidable.    |
+| Shape preview jank                   | Use lightweight overlay painter separate from main stroke list until commit.  |
+| Persistence corruption               | Version & try/catch + skip invalid entries; offer “Reset All Data”.           |
+| Undo history bloat                   | Consider soft cap (e.g., 5k strokes) with user warning when exceeded.         |
+
+## 30. Accessibility Enhancements
+
+- Each tool button includes role (toggle or mutually exclusive radio group semantics) for screen readers.
+- Shape preview announces: “Drawing rectangle preview – release to place.”
+- Gallery items: “Drawing 3 of 7 – 42% colored – last edited 10:32.”
+- High contrast focus outlines remain consistent in dark/light themes.
+
+## 31. Internationalization Readiness
+
+While still English-only, all new user-visible strings must route through a central strings layer (existing `AppStrings` abstraction can evolve to `AppLocalizations` later). No string concatenation for sentences where grammatical order may vary; use parameterized helper functions.
+
+## 32. Phased Implementation Plan (Advanced)
+
+| Phase | Scope                                                          | Exit Criteria                                            |
+| ----- | -------------------------------------------------------------- | -------------------------------------------------------- |
+| A1    | Start screen + navigation + repository skeleton                | Can navigate between modes (empty stubs).                |
+| A2    | Multi-tool core (brush, eraser, eyedropper) + tool selector UI | Tools function; undo works per tool.                     |
+| A3    | Shape tools + grouped undo                                     | Shapes draw & commit single undo step.                   |
+| A4    | Color picker + recent colors + theme persistence               | Custom color applied; persists across reload.            |
+| A5    | Coloring mode + progress persistence                           | Page progress loads & persists.                          |
+| A6    | Gallery (list, open, delete) + thumbnails                      | Gallery fully functional.                                |
+| A7    | Fill bucket + export scaling + performance tuning              | Large-area fill acceptable performance.                  |
+| A8    | Accessibility & polish + i18n scaffolding                      | All new controls labeled; basic string extraction ready. |
+
+## 33. Updated Definition of Done (Advanced Layer)
+
+- All FR-32 through FR-43 (core advanced) implemented; remaining FR-44–FR-54 evaluated and either implemented or explicitly deferred with rationale.
+- Persistence resilient to malformed entries.
+- No regressions in MVP acceptance tests.
+- All new strings centralized.
+- Manual performance + accessibility sweep documented.
+
+## 34. Backlog (Post-Advanced Future)
+
+- Offline-capable PWA install (service worker caching canvas assets).
+- Collaboration (OT / CRDT stroke synchronization).
+- Layer management & grouping.
+- Pressure-sensitive input (Stylus APIs) with variable opacity/width.
+- Animated strokes / playback mode.
+- Plugin-style custom brushes.
+
+---
+
+End of Advanced Extension.
