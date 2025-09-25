@@ -11,6 +11,13 @@ class DrawingState extends ChangeNotifier {
   final List<Stroke> _strokes = [];
   Stroke? _inProgress;
 
+  // Active drawing attributes (FR-08, FR-10)
+  Color _currentColor = const Color(0xFF000000);
+  double _currentWidth = 2.0;
+
+  Color get currentColor => _currentColor;
+  double get currentWidth => _currentWidth;
+
   /// Finalized strokes (immutable outward view).
   List<Stroke> get strokes => List.unmodifiable(_strokes);
   Stroke? get inProgress => _inProgress;
@@ -21,16 +28,16 @@ class DrawingState extends ChangeNotifier {
   /// Begins a new stroke with current pointer position.
   void startStroke(
     Offset point, {
-    Color color = const Color(0xFF000000),
-    double width = 2.0,
+    Color? color,
+    double? width,
   }) {
     _currentPoints
       ..clear()
       ..add(point);
     _inProgress = Stroke(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
-      color: color,
-      width: width,
+      color: color ?? _currentColor,
+      width: width ?? _currentWidth,
       points: List.of(_currentPoints),
       toolType: ToolType.pencil,
       timestamp: DateTime.now(),
@@ -86,6 +93,20 @@ class DrawingState extends ChangeNotifier {
     );
     _inProgress = null;
     _currentPoints.clear();
+    notifyListeners();
+  }
+
+  /// Sets current drawing color.
+  void setColor(Color color) {
+    if (color == _currentColor) return;
+    _currentColor = color;
+    notifyListeners();
+  }
+
+  /// Sets current stroke width.
+  void setWidth(double width) {
+    if (width == _currentWidth) return;
+    _currentWidth = width;
     notifyListeners();
   }
 }

@@ -9,3 +9,5 @@ I am building the app described in the PRD.md.
 Look at the requirements in PRD.md and make a full step-by-step implementation plan called PLAN.md. Include a checklist for each step at the end.
 ---
 Okay, let's start actual coding. For that have a look at the PLAN.md to determine the next required step. Some basic folder structure was already achieved using the command `flutter create .`
+---
+Alright, proceed with the next step of the plan

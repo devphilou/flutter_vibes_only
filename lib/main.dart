@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'state/drawing_state.dart';
 import 'widgets/drawing_canvas.dart';
+import 'widgets/toolbar.dart';
 
 /// Entry point for the Paint Vibes Only app.
 void main() {
@@ -47,22 +48,46 @@ class _DrawingScreenState extends State<_DrawingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Paint Vibes Only')),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 300, minHeight: 300),
-          child: AspectRatio(
-            aspectRatio: 4 / 3,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DrawingToolbar(state: _drawingState),
                 ),
-              ),
-              child: DrawingCanvas(state: _drawingState),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 300,
+                        minHeight: 300,
+                        maxWidth: 1200,
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 4 / 3,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            border: Border.all(
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
+                            ),
+                          ),
+                          child: DrawingCanvas(state: _drawingState),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
