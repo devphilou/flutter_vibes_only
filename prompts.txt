@@ -24,3 +24,5 @@ Alright, proceed with Phase P5 of the plan
 ------------------------------------------------------
 Like you derived before the product requirements document (PRD.md) for an MVP for the paint app which is described in the README, we want now to go the next step after we achieved our MVP.
 For that, extend the PRD.md to meet the advanced requirements mentioned in the README.
+---
+Yes, create a companion ADVANCED_PLAN.md for the implementation plan
