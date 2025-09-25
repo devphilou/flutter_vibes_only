@@ -44,6 +44,21 @@ class DrawingToolbar extends StatelessWidget {
               selectedWidth: state.currentWidth,
               onChanged: state.setWidth,
             ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  tooltip: 'Undo',
+                  onPressed: state.canUndo ? state.undo : null,
+                  icon: const Icon(Icons.undo),
+                ),
+                IconButton(
+                  tooltip: 'Redo',
+                  onPressed: state.canRedo ? state.redo : null,
+                  icon: const Icon(Icons.redo),
+                ),
+              ],
+            ),
           ],
         );
       },

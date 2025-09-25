@@ -11,3 +11,6 @@ Look at the requirements in PRD.md and make a full step-by-step implementation p
 Okay, let's start actual coding. For that have a look at the PLAN.md to determine the next required step. Some basic folder structure was already achieved using the command `flutter create .`
 ---
 Alright, proceed with the next step of the plan
+---
+Perfect, color palette and stroke width selector are working.
+Go ahead with Phase P2 of the plan.

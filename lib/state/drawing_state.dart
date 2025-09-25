@@ -9,6 +9,7 @@ class DrawingState extends ChangeNotifier {
   DrawingState();
 
   final List<Stroke> _strokes = [];
+  final List<Stroke> _redo = [];
   Stroke? _inProgress;
 
   // Active drawing attributes (FR-08, FR-10)
@@ -21,6 +22,8 @@ class DrawingState extends ChangeNotifier {
   /// Finalized strokes (immutable outward view).
   List<Stroke> get strokes => List.unmodifiable(_strokes);
   Stroke? get inProgress => _inProgress;
+  bool get canUndo => _strokes.isNotEmpty;
+  bool get canRedo => _redo.isNotEmpty;
 
   // For P0 we store temp mutable points for current stroke.
   final List<Offset> _currentPoints = [];
@@ -91,8 +94,24 @@ class DrawingState extends ChangeNotifier {
         timestamp: stroke.timestamp,
       ),
     );
+    // New forward edit invalidates redo history (FR-06).
+    _redo.clear();
     _inProgress = null;
     _currentPoints.clear();
+    notifyListeners();
+  }
+
+  /// Moves the most recent stroke to the redo stack (FR-07).
+  void undo() {
+    if (!canUndo) return;
+    _redo.add(_strokes.removeLast());
+    notifyListeners();
+  }
+
+  /// Restores the most recently undone stroke (FR-07).
+  void redo() {
+    if (!canRedo) return;
+    _strokes.add(_redo.removeLast());
     notifyListeners();
   }
 
