@@ -46,23 +46,34 @@ class _ColorSwatch extends StatelessWidget {
     final borderColor = selected
         ? Theme.of(context).colorScheme.onSurface
         : Theme.of(context).dividerColor;
+    final label = 'Color: ${_semanticName(color)}'
+        '${selected ? ' (selected)' : ''}';
     return Semantics(
-      label: 'Color: ${_semanticName(color)}${selected ? ' (selected)' : ''}',
+      label: label,
       button: true,
       selected: selected,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor,
-              width: selected ? 3 : 1,
+      child: FocusableActionDetector(
+        onShowHoverHighlight: (_) {},
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minWidth: 48,
+              minHeight: 48,
+            ),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: borderColor,
+                  width: selected ? 3 : 1,
+                ),
+              ),
             ),
           ),
         ),

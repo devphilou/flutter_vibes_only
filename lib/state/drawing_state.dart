@@ -49,7 +49,7 @@ class DrawingState extends ChangeNotifier {
   }
 
   /// Appends a point if sufficiently distant to reduce noise.
-  void appendPoint(Offset point, {double minDistance = 0.5}) {
+  void appendPoint(Offset point, {double minDistance = 0.75}) {
     if (_inProgress == null) return;
     final last = _currentPoints.isNotEmpty ? _currentPoints.last : null;
     if (last != null) {

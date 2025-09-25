@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'state/drawing_state.dart';
+import 'strings/app_strings.dart';
 import 'widgets/drawing_canvas.dart';
 import 'widgets/toolbar.dart';
 
@@ -16,7 +17,7 @@ class PaintVibesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Paint Vibes Only',
+      title: AppStrings.appTitle,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -48,7 +49,7 @@ class _DrawingScreenState extends State<_DrawingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Paint Vibes Only')),
+      appBar: AppBar(title: const Text(AppStrings.appTitle)),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Padding(
