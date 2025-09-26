@@ -16,15 +16,33 @@ class EyedropperTool implements Tool {
 
   @override
   void onStart(DrawingState state, Offset p) {
-    // Heuristic: find the last stroke whose path passes near the tap point.
-    // We'll do a simple distance check to polyline segments.
-    Color? sampled;
-    for (var i = state.strokes.length - 1; i >= 0 && sampled == null; i--) {
+    _performPick(state, p);
+  }
+
+  @override
+  void onUpdate(DrawingState state, Offset p) {}
+
+  @override
+  void onEnd(DrawingState state) {}
+
+  Future<void> _performPick(DrawingState state, Offset p) async {
+    // Try pixel sampling first.
+    Color? sampled = await state.samplePixel(p);
+    // Fallback heuristic if pixel sampling failed.
+    sampled ??= _strokeHeuristic(state, p);
+    if (sampled != null) {
+      state.setColor(sampled);
+      state.completeEyedropperSelection();
+    }
+  }
+
+  Color? _strokeHeuristic(DrawingState state, Offset p) {
+    for (var i = state.strokes.length - 1; i >= 0; i--) {
       final stroke = state.strokes[i];
       final pts = stroke.points;
       if (pts.length < 2) {
         if (pts.isNotEmpty && (pts.first - p).distance <= stroke.width) {
-          sampled = stroke.color;
+          return stroke.color;
         }
         continue;
       }
@@ -33,23 +51,12 @@ class EyedropperTool implements Tool {
         final b = pts[j + 1];
         final dist = _distancePointToSegment(p, a, b);
         if (dist <= stroke.width * 0.75) {
-          sampled = stroke.color;
-          break;
+          return stroke.color;
         }
       }
     }
-    if (sampled != null) {
-      state.setColor(sampled);
-    }
-    // Auto revert back to previous drawing tool for flow.
-    state.completeEyedropperSelection();
+    return null;
   }
-
-  @override
-  void onUpdate(DrawingState state, Offset p) {}
-
-  @override
-  void onEnd(DrawingState state) {}
 
   double _distancePointToSegment(Offset p, Offset a, Offset b) {
     final ab = b - a;

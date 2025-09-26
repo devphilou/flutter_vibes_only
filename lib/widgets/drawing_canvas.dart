@@ -23,6 +23,12 @@ class DrawingCanvas extends StatelessWidget {
       child: Listener(
         // Listener provides more granular pointer events if needed later.
         child: GestureDetector(
+          onTapDown: (details) {
+            state.attachCanvasBoundaryKey(boundaryKey);
+            // Ensure tools that act on single tap (eyedropper, future bucket) get start event.
+            state.handlePointerStart(details.localPosition);
+            state.handlePointerEnd();
+          },
           onPanStart: (details) =>
               state.handlePointerStart(details.localPosition),
           onPanUpdate: (details) =>

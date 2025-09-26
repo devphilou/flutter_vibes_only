@@ -2,6 +2,8 @@ import 'dart:developer' as dev;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 import '../models/stroke.dart';
 import '../tools/brush_tool.dart';
@@ -38,6 +40,13 @@ class DrawingState extends ChangeNotifier {
   ToolType _activeTool = ToolType.pencil;
   final Map<ToolType, Tool> _toolRegistry = {};
   ToolType? _previousToolBeforeEyedropper; // For auto-revert after pick.
+  // Pixel sampling (eyedropper) cache fields.
+  GlobalKey? _canvasBoundaryKey;
+  Uint8List? _cachedRgba; // RGBA byte buffer
+  int _cachedWidth = 0;
+  int _cachedHeight = 0;
+  DateTime? _cachedAt;
+  bool _samplingInProgress = false;
   // Stretch instrumentation counters
   int _strokeCount = 0;
   int _undoCount = 0;
@@ -101,6 +110,78 @@ class DrawingState extends ChangeNotifier {
     tool?.onEnd(this);
   }
 
+  /// Attach the canvas boundary key so pixel sampling can snapshot.
+  void attachCanvasBoundaryKey(GlobalKey key) {
+    if (_canvasBoundaryKey != key) {
+      _canvasBoundaryKey = key;
+      _invalidateSampleCache();
+    }
+  }
+
+  void _invalidateSampleCache() {
+    _cachedRgba = null;
+    _cachedAt = null;
+  }
+
+  /// Samples a pixel color at the given logical canvas coordinate.
+  /// Uses a short-lived cached snapshot (default max age 500ms) to avoid
+  /// repeated expensive `toImage()` calls while user is sampling.
+  Future<Color?> samplePixel(Offset logicalPoint,
+      {Duration cacheMaxAge = const Duration(milliseconds: 500)}) async {
+    final key = _canvasBoundaryKey;
+    if (key == null) return null;
+    final ctx = key.currentContext;
+    if (ctx == null) return null;
+    if (_samplingInProgress) {
+      // If capture in progress, wait a tick and try using existing cache.
+      await Future.delayed(const Duration(milliseconds: 16));
+    }
+    final now = DateTime.now();
+    final cacheValid = _cachedRgba != null &&
+        _cachedAt != null &&
+        now.difference(_cachedAt!) <= cacheMaxAge;
+    if (!cacheValid) {
+      final ro = ctx.findRenderObject();
+      if (ro is! RenderRepaintBoundary) return null;
+      try {
+        _samplingInProgress = true;
+        // pixelRatio 1 ensures logical coordinates map 1:1 to pixels.
+        final image = await ro.toImage(pixelRatio: 1.0);
+        final byteData =
+            await image.toByteData(format: ImageByteFormat.rawRgba);
+        if (byteData == null) return null;
+        _cachedRgba = byteData.buffer.asUint8List();
+        _cachedWidth = image.width;
+        _cachedHeight = image.height;
+        _cachedAt = now;
+      } finally {
+        _samplingInProgress = false;
+      }
+    }
+    final data = _cachedRgba;
+    if (data == null) return null;
+    final x = logicalPoint.dx.round();
+    final y = logicalPoint.dy.round();
+    if (x < 0 || y < 0 || x >= _cachedWidth || y >= _cachedHeight) return null;
+    final index = (y * _cachedWidth + x) * 4;
+    if (index + 3 >= data.length) return null;
+    final r = data[index];
+    final g = data[index + 1];
+    final b = data[index + 2];
+    final a = data[index + 3];
+    // Ignore fully transparent pixels (treat as no color hit for eyedropper).
+    if (a == 0) {
+      dev.log('samplePixel transparent at ($x,$y)', name: 'eyedropper');
+      return null;
+    }
+    final color = Color.fromARGB(a, r, g, b);
+    dev.log(
+      'samplePixel hit (${color.value.toRadixString(16)}) at ($x,$y) a=$a',
+      name: 'eyedropper',
+    );
+    return color;
+  }
+
   /// Appends a point if sufficiently distant to reduce noise.
   void appendPoint(Offset point, {double minDistance = 0.75}) {
     if (_inProgress == null) return;
@@ -153,6 +234,7 @@ class DrawingState extends ChangeNotifier {
     _currentPoints.clear();
     _strokeCount++;
     dev.log('stroke_added total=$_strokeCount', name: 'drawing');
+    _invalidateSampleCache();
     notifyListeners();
   }
 
@@ -162,6 +244,7 @@ class DrawingState extends ChangeNotifier {
     _redo.add(_strokes.removeLast());
     _undoCount++;
     dev.log('undo count=$_undoCount', name: 'drawing');
+    _invalidateSampleCache();
     notifyListeners();
   }
 
@@ -175,6 +258,7 @@ class DrawingState extends ChangeNotifier {
     dev.log(
         'clear_all strokesCleared; totals strokes=$_strokeCount undo=$_undoCount redo=$_redoCount',
         name: 'drawing');
+    _invalidateSampleCache();
     notifyListeners();
   }
 
@@ -184,6 +268,7 @@ class DrawingState extends ChangeNotifier {
     _strokes.add(_redo.removeLast());
     _redoCount++;
     dev.log('redo count=$_redoCount', name: 'drawing');
+    _invalidateSampleCache();
     notifyListeners();
   }
 
