@@ -37,6 +37,7 @@ class DrawingState extends ChangeNotifier {
   double _currentWidth = 2.0;
   ToolType _activeTool = ToolType.pencil;
   final Map<ToolType, Tool> _toolRegistry = {};
+  ToolType? _previousToolBeforeEyedropper; // For auto-revert after pick.
   // Stretch instrumentation counters
   int _strokeCount = 0;
   int _undoCount = 0;
@@ -206,8 +207,23 @@ class DrawingState extends ChangeNotifier {
   /// Sets the active tool (A2 multi-tool support).
   void setActiveTool(ToolType tool) {
     if (tool == _activeTool) return;
+    if (tool == ToolType.eyedropper && _activeTool != ToolType.eyedropper) {
+      _previousToolBeforeEyedropper = _activeTool;
+    }
     _activeTool = tool;
     dev.log('tool_changed value=${tool.name}', name: 'drawing');
     notifyListeners();
+  }
+
+  /// Reverts back to the previous non‑eyedropper tool after a color pick.
+  void completeEyedropperSelection() {
+    if (_activeTool == ToolType.eyedropper &&
+        _previousToolBeforeEyedropper != null) {
+      final revert = _previousToolBeforeEyedropper!;
+      _previousToolBeforeEyedropper = null;
+      _activeTool = revert;
+      dev.log('tool_reverted_after_pick value=${revert.name}', name: 'drawing');
+      notifyListeners();
+    }
   }
 }

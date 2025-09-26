@@ -4,8 +4,10 @@ import '../models/stroke.dart';
 import '../state/drawing_state.dart';
 import 'tool.dart';
 
-/// Eyedropper (stub): on tap start selects last stroke color overlapping point.
-/// For now, just sets current color to last stroke's color and does not create a stroke.
+/// Eyedropper tool: on tap it samples the nearest stroke color under the cursor
+/// (searching from top-most / most recent). It performs a geometric distance
+/// check against stroke segments and selects the first match, then automatically
+/// reverts to the previous drawing tool for fluid workflow.
 class EyedropperTool implements Tool {
   const EyedropperTool();
 
@@ -14,11 +16,33 @@ class EyedropperTool implements Tool {
 
   @override
   void onStart(DrawingState state, Offset p) {
-    // Simple heuristic: sample last stroke color if any.
-    if (state.strokes.isNotEmpty) {
-      final color = state.strokes.last.color;
-      state.setColor(color);
+    // Heuristic: find the last stroke whose path passes near the tap point.
+    // We'll do a simple distance check to polyline segments.
+    Color? sampled;
+    for (var i = state.strokes.length - 1; i >= 0 && sampled == null; i--) {
+      final stroke = state.strokes[i];
+      final pts = stroke.points;
+      if (pts.length < 2) {
+        if (pts.isNotEmpty && (pts.first - p).distance <= stroke.width) {
+          sampled = stroke.color;
+        }
+        continue;
+      }
+      for (var j = 0; j < pts.length - 1; j++) {
+        final a = pts[j];
+        final b = pts[j + 1];
+        final dist = _distancePointToSegment(p, a, b);
+        if (dist <= stroke.width * 0.75) {
+          sampled = stroke.color;
+          break;
+        }
+      }
     }
+    if (sampled != null) {
+      state.setColor(sampled);
+    }
+    // Auto revert back to previous drawing tool for flow.
+    state.completeEyedropperSelection();
   }
 
   @override
@@ -26,4 +50,15 @@ class EyedropperTool implements Tool {
 
   @override
   void onEnd(DrawingState state) {}
+
+  double _distancePointToSegment(Offset p, Offset a, Offset b) {
+    final ab = b - a;
+    final ap = p - a;
+    final abLen2 = ab.dx * ab.dx + ab.dy * ab.dy;
+    if (abLen2 == 0) return (p - a).distance;
+    var t = (ap.dx * ab.dx + ap.dy * ab.dy) / abLen2;
+    t = t.clamp(0.0, 1.0);
+    final proj = Offset(a.dx + ab.dx * t, a.dy + ab.dy * t);
+    return (p - proj).distance;
+  }
 }
