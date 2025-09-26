@@ -60,3 +60,5 @@ Please fix this.
 Okay, prepare for phase A2 now
 ---
 Yes, continue with your proposed improvements and start with the tool registry refactor.
+---
+Yes, continue with your proposed improvements and implement proper erasing.

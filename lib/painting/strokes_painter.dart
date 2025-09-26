@@ -11,6 +11,9 @@ class StrokesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Use a saveLayer so eraser strokes (BlendMode.clear) punch holes in what
+    // has already been drawn rather than in the underlying scaffold.
+    canvas.saveLayer(Offset.zero & size, Paint());
     for (final s in strokes) {
       _paintStroke(canvas, s);
     }
@@ -18,12 +21,15 @@ class StrokesPainter extends CustomPainter {
     if (ip != null) {
       _paintStroke(canvas, ip);
     }
+    canvas.restore();
   }
 
   void _paintStroke(Canvas canvas, Stroke stroke) {
     if (stroke.points.isEmpty) return;
+    final isEraser = stroke.toolType == ToolType.eraser;
     final paint = Paint()
-      ..color = stroke.color
+      ..color = isEraser ? const Color(0x00000000) : stroke.color
+      ..blendMode = isEraser ? BlendMode.clear : BlendMode.srcOver
       ..strokeWidth = stroke.width
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round

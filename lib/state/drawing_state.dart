@@ -68,6 +68,8 @@ class DrawingState extends ChangeNotifier {
     Color? color,
     double? width,
   }) {
+    // For eraser strokes we still store a color (ignored) and rely on
+    // toolType in the painter to apply BlendMode.clear. Keeping model simple.
     _currentPoints
       ..clear()
       ..add(point);
