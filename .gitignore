@@ -1,4 +1,11 @@
 /.idea/
-.dart_tool/
-.vscode/
-build/
+/.dart_tool/*
+/.vscode/
+/build/
+
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/package_config_subset
+.dart_tool/package_config.json
+.dart_tool/package_graph.json
+.dart_tool/dartpad/web_plugin_registrant.dart

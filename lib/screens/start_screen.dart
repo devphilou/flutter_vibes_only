@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../main.dart' show ThemeController; // Access theme controller.
 import '../routing/app_router.dart';
 import '../strings/app_strings.dart';
 
@@ -11,8 +12,18 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final themeController = ThemeController.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.appTitle)),
+      appBar: AppBar(
+        title: const Text(AppStrings.appTitle),
+        actions: [
+          IconButton(
+            tooltip: 'Cycle Theme',
+            onPressed: themeController.cycle,
+            icon: const Icon(Icons.brightness_6),
+          ),
+        ],
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),

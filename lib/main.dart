@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'routing/app_router.dart';
 import 'strings/app_strings.dart';
@@ -21,11 +22,30 @@ class _PaintVibesAppState extends State<PaintVibesApp> {
   ThemeMode _mode = ThemeMode.system;
   late final GoRouter _router;
   final _navKey = GlobalKey<NavigatorState>();
+  static const _themePrefKey = 'theme_mode';
 
   @override
   void initState() {
     super.initState();
     _router = createRouter(navigatorKey: _navKey);
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final value = prefs.getString(_themePrefKey);
+      if (value != null) {
+        setState(() {
+          _mode = ThemeMode.values.firstWhere(
+            (m) => m.name == value,
+            orElse: () => ThemeMode.system,
+          );
+        });
+      }
+    } catch (_) {
+      // Non-fatal: ignore failures.
+    }
   }
 
   void _cycleTheme() {
@@ -36,11 +56,14 @@ class _PaintVibesAppState extends State<PaintVibesApp> {
         ThemeMode.dark => ThemeMode.system,
       };
     });
+    // Persist asynchronously.
+    SharedPreferences.getInstance()
+        .then((p) => p.setString(_themePrefKey, _mode.name));
   }
 
   @override
   Widget build(BuildContext context) {
-    return _ThemeController(
+    return ThemeController(
       mode: _mode,
       cycle: _cycleTheme,
       child: MaterialApp.router(
@@ -58,17 +81,6 @@ class _PaintVibesAppState extends State<PaintVibesApp> {
           useMaterial3: true,
         ),
         routerConfig: _router,
-        builder: (context, child) {
-          final controller = _ThemeController.of(context);
-          return Scaffold(
-            body: child,
-            floatingActionButton: FloatingActionButton(
-              tooltip: 'Cycle Theme',
-              onPressed: controller.cycle,
-              child: const Icon(Icons.brightness_6),
-            ),
-          );
-        },
       ),
     );
   }
@@ -76,8 +88,8 @@ class _PaintVibesAppState extends State<PaintVibesApp> {
 
 /// Inherited controller giving descendants access to theme toggling while a
 /// more persistent settings system is prepared in A1 persistence work.
-class _ThemeController extends InheritedWidget {
-  const _ThemeController({
+class ThemeController extends InheritedWidget {
+  const ThemeController({
     required this.mode,
     required this.cycle,
     required super.child,
@@ -86,10 +98,10 @@ class _ThemeController extends InheritedWidget {
   final ThemeMode mode;
   final VoidCallback cycle;
 
-  static _ThemeController of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_ThemeController>()!;
+  static ThemeController of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ThemeController>()!;
 
   @override
-  bool updateShouldNotify(covariant _ThemeController oldWidget) =>
+  bool updateShouldNotify(covariant ThemeController oldWidget) =>
       oldWidget.mode != mode;
 }
