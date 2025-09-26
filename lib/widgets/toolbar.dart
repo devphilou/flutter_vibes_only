@@ -10,6 +10,7 @@ import 'color_palette.dart';
 import 'confirm_clear_dialog.dart';
 import 'stroke_width_selector.dart';
 import 'stroke_width_slider.dart';
+import 'tool_selector.dart';
 
 /// Toolbar for selecting color & stroke width (Phase P1). Undo/Redo/Export will
 /// be added in later phases.
@@ -49,6 +50,9 @@ class DrawingToolbar extends StatelessWidget {
             spacing: 24,
             runSpacing: 16,
             children: [
+              // Tool selector (A2)
+              ToolSelector(state: state),
+              const SizedBox(width: 8),
               ColorPalette(
                 colors: _palette,
                 selected: state.currentColor,

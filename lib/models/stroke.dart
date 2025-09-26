@@ -1,7 +1,8 @@
 import 'dart:ui';
 
-/// Supported drawing tools. Only [pencil] for MVP (Phase P0).
-enum ToolType { pencil }
+/// Supported drawing tools (A2 expanded). Some variants may be unused until
+/// corresponding phases land.
+enum ToolType { pencil, brush, eraser, eyedropper, bucket }
 
 /// Immutable stroke consisting of ordered points captured during a drag.
 class Stroke {

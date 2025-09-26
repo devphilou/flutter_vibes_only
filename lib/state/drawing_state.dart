@@ -16,6 +16,7 @@ class DrawingState extends ChangeNotifier {
   // Active drawing attributes (FR-08, FR-10)
   Color _currentColor = const Color(0xFF000000);
   double _currentWidth = 2.0;
+  ToolType _activeTool = ToolType.pencil;
   // Stretch instrumentation counters
   int _strokeCount = 0;
   int _undoCount = 0;
@@ -27,6 +28,7 @@ class DrawingState extends ChangeNotifier {
 
   Color get currentColor => _currentColor;
   double get currentWidth => _currentWidth;
+  ToolType get activeTool => _activeTool;
 
   /// Finalized strokes (immutable outward view).
   List<Stroke> get strokes => List.unmodifiable(_strokes);
@@ -51,7 +53,7 @@ class DrawingState extends ChangeNotifier {
       color: color ?? _currentColor,
       width: width ?? _currentWidth,
       points: List.of(_currentPoints),
-      toolType: ToolType.pencil,
+      toolType: _activeTool,
       timestamp: DateTime.now(),
     );
     notifyListeners();
@@ -157,6 +159,14 @@ class DrawingState extends ChangeNotifier {
     if (width == _currentWidth) return;
     _currentWidth = width;
     dev.log('width_changed value=$width', name: 'drawing');
+    notifyListeners();
+  }
+
+  /// Sets the active tool (A2 multi-tool support).
+  void setActiveTool(ToolType tool) {
+    if (tool == _activeTool) return;
+    _activeTool = tool;
+    dev.log('tool_changed value=${tool.name}', name: 'drawing');
     notifyListeners();
   }
 }
