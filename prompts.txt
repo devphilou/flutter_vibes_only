@@ -64,3 +64,9 @@ Yes, continue with your proposed improvements and start with the tool registry r
 Yes, continue with your proposed improvements and implement proper erasing.
 ---
 Implement the improvements to have proper eyedropper feature.
+---
+Okay, go further with Pixel-level sampling (render RepaintBoundary.toImage() and read pixel) for exact accuracy (costly—add caching and debounce)
+- [AFTER ERROR] -
+Something seems to went wrong with the latest changes: Now when I use the eyedropper it has no color at all.
+-
+I still get the same issue. So before it worked. No again I select the eyedropper, I before used the brushed to for example to make a stroke in blue and the eyedropper is not recognizing the blue color.
