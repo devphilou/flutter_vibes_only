@@ -30,3 +30,29 @@ Yes, create a companion ADVANCED_PLAN.md for the implementation plan
 Yes, introduce go_router in A1
 ---
 Proceed with next steps of A1
+---
+Alright, proceed with the A1 completion.
+- [AFTER ERROR] -
+Okay, so right now an experiencing an error when trying to navigate from the start screen to the free drawing screen:
+```
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown building Builder:
+dependOnInheritedWidgetOfExactType<AppServices>() or dependOnInheritedElement() was called before
+_FreeDrawScreenState.initState() completed.
+When an inherited widget changes, for example if the value of Theme.of() changes, its dependent
+widgets are rebuilt. If the dependent widget's reference to the inherited widget is in a constructor
+or an initState() method, then the rebuilt dependent widget will not reflect the changes in the
+inherited widget.
+Typically references to inherited widgets should occur in widget build() methods. Alternatively,
+initialization based on inherited widgets can be placed in the didChangeDependencies method, which
+is called after initState and whenever the dependencies change thereafter.
+
+The relevant error-causing widget was:
+  Navigator-[LabeledGlobalKey<NavigatorState>#4da73]
+  Navigator:file:///Users/pkaiser/.pub-cache/hosted/pub.dev/go_router-14.8.1/lib/src/builder.dart:438:16
+
+When the exception was thrown, this was the stack:
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/errors.dart 288:3  throw_ ...
+```
+
+Please fix this.

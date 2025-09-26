@@ -1,3 +1,4 @@
 1. start drawing outside of canvas not possible; 
     but as soon as I start drawing within the canvas and move the mouse out of it while drawing
     I am able to draw outside of the boundaries
+2. back button in free drawing section is not working / navigating back; only the go back functionality of the browser works

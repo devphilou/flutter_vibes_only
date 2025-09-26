@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'repository/drawing_repository.dart';
+import 'repository/in_memory_repository.dart';
 import 'routing/app_router.dart';
 import 'strings/app_strings.dart';
 
@@ -63,24 +65,28 @@ class _PaintVibesAppState extends State<PaintVibesApp> {
 
   @override
   Widget build(BuildContext context) {
+    final repo = InMemoryDrawingRepository();
     return ThemeController(
       mode: _mode,
       cycle: _cycleTheme,
-      child: MaterialApp.router(
-        title: AppStrings.appTitle,
-        debugShowCheckedModeBanner: false,
-        themeMode: _mode,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple, brightness: Brightness.light),
-          useMaterial3: true,
+      child: AppServices(
+        repository: repo,
+        child: MaterialApp.router(
+          title: AppStrings.appTitle,
+          debugShowCheckedModeBanner: false,
+          themeMode: _mode,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.deepPurple, brightness: Brightness.light),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.deepPurple, brightness: Brightness.dark),
+            useMaterial3: true,
+          ),
+          routerConfig: _router,
         ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple, brightness: Brightness.dark),
-          useMaterial3: true,
-        ),
-        routerConfig: _router,
       ),
     );
   }
@@ -104,4 +110,21 @@ class ThemeController extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant ThemeController oldWidget) =>
       oldWidget.mode != mode;
+}
+
+/// Provides access to application-wide services (repository now, more later).
+class AppServices extends InheritedWidget {
+  const AppServices({
+    required this.repository,
+    required super.child,
+    super.key,
+  });
+
+  final DrawingRepository repository;
+
+  static AppServices of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AppServices>()!;
+
+  @override
+  bool updateShouldNotify(covariant AppServices oldWidget) => false;
 }
