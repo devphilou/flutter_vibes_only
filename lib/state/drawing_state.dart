@@ -4,10 +4,29 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
 import '../models/stroke.dart';
+import '../tools/brush_tool.dart';
+import '../tools/bucket_tool.dart';
+import '../tools/eraser_tool.dart';
+import '../tools/eyedropper_tool.dart';
+import '../tools/pencil_tool.dart';
+import '../tools/tool.dart';
 
 /// Manages the collection of finalized strokes and an in‑progress stroke.
 class DrawingState extends ChangeNotifier {
-  DrawingState();
+  DrawingState({List<Tool>? tools}) {
+    // Initialize registry with provided tools or default set.
+    final defaultTools = tools ??
+        const [
+          PencilTool(),
+          BrushTool(),
+          EraserTool(),
+          EyedropperTool(),
+          BucketTool(),
+        ];
+    for (final t in defaultTools) {
+      _toolRegistry[t.type] = t;
+    }
+  }
 
   final List<Stroke> _strokes = [];
   final List<Stroke> _redo = [];
@@ -17,6 +36,7 @@ class DrawingState extends ChangeNotifier {
   Color _currentColor = const Color(0xFF000000);
   double _currentWidth = 2.0;
   ToolType _activeTool = ToolType.pencil;
+  final Map<ToolType, Tool> _toolRegistry = {};
   // Stretch instrumentation counters
   int _strokeCount = 0;
   int _undoCount = 0;
@@ -29,6 +49,9 @@ class DrawingState extends ChangeNotifier {
   Color get currentColor => _currentColor;
   double get currentWidth => _currentWidth;
   ToolType get activeTool => _activeTool;
+  Tool? get activeToolInstance => _toolRegistry[_activeTool];
+  List<ToolType> get availableTools =>
+      _toolRegistry.keys.toList(growable: false);
 
   /// Finalized strokes (immutable outward view).
   List<Stroke> get strokes => List.unmodifiable(_strokes);
@@ -57,6 +80,22 @@ class DrawingState extends ChangeNotifier {
       timestamp: DateTime.now(),
     );
     notifyListeners();
+  }
+
+  // --- Tool dispatch convenience wrappers (A2 refactor) ---
+  void handlePointerStart(Offset p) {
+    final tool = activeToolInstance;
+    tool?.onStart(this, p);
+  }
+
+  void handlePointerUpdate(Offset p) {
+    final tool = activeToolInstance;
+    tool?.onUpdate(this, p);
+  }
+
+  void handlePointerEnd() {
+    final tool = activeToolInstance;
+    tool?.onEnd(this);
   }
 
   /// Appends a point if sufficiently distant to reduce noise.

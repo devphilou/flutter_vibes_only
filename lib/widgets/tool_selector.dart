@@ -9,12 +9,8 @@ class ToolSelector extends StatelessWidget {
 
   final DrawingState state;
 
-  static const _tools = [
-    ToolType.pencil,
-    ToolType.brush,
-    ToolType.eraser,
-    ToolType.eyedropper,
-  ];
+  // Available tools now driven by DrawingState registry so selector updates
+  // automatically if tools are injected differently (testing / feature flags).
 
   IconData _icon(ToolType t) => switch (t) {
         ToolType.pencil => Icons.edit,
@@ -40,7 +36,7 @@ class ToolSelector extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            for (final tool in _tools)
+            for (final tool in state.availableTools)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Semantics(
