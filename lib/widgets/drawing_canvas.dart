@@ -45,6 +45,8 @@ class DrawingCanvas extends StatelessWidget {
                   painter: StrokesPainter(
                     strokes: state.strokes,
                     inProgress: state.inProgress,
+                    previewShape: state.previewShape,
+                    previewColor: state.currentColor,
                   ),
                 ),
               );

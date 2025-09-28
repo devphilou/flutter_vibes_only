@@ -54,6 +54,19 @@ class DrawingDocument {
                       .map((p) =>
                           [p.dx.toStringAsFixed(2), p.dy.toStringAsFixed(2)])
                       .toList(),
+                  if (s.shapeMeta != null)
+                    'shape': {
+                      'type': s.shapeMeta!.type.name,
+                      'start': [
+                        s.shapeMeta!.start.dx.toStringAsFixed(2),
+                        s.shapeMeta!.start.dy.toStringAsFixed(2),
+                      ],
+                      'end': [
+                        s.shapeMeta!.end.dx.toStringAsFixed(2),
+                        s.shapeMeta!.end.dy.toStringAsFixed(2),
+                      ],
+                    },
+                  if (s.blendMode != null) 'blendMode': s.blendMode!.index,
                 })
             .toList(),
       };
@@ -83,8 +96,38 @@ class DrawingDocument {
             orElse: () => ToolType.pencil,
           ),
           timestamp: DateTime.parse(s['timestamp'] as String),
+          shapeMeta: _parseShapeMeta(s['shape']),
+          blendMode: _parseBlendMode(s['blendMode']),
         );
       }).toList(),
     );
+  }
+
+  static ShapeMeta? _parseShapeMeta(dynamic json) {
+    if (json == null) return null;
+    try {
+      final map = json as Map<String, dynamic>;
+      final typeStr = map['type'] as String?;
+      if (typeStr == null) return null;
+      final type = ShapeType.values.firstWhere(
+        (e) => e.name == typeStr,
+        orElse: () => ShapeType.line,
+      );
+      Offset _toOffset(List<dynamic> arr) => Offset(
+          double.parse(arr[0].toString()), double.parse(arr[1].toString()));
+      final start = _toOffset(map['start'] as List<dynamic>);
+      final end = _toOffset(map['end'] as List<dynamic>);
+      return ShapeMeta(type: type, start: start, end: end);
+    } catch (_) {
+      return null; // Corrupted shape meta gracefully ignored.
+    }
+  }
+
+  static BlendMode? _parseBlendMode(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is int && raw >= 0 && raw < BlendMode.values.length) {
+      return BlendMode.values[raw];
+    }
+    return null;
   }
 }

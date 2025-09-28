@@ -18,11 +18,12 @@ These asset images are totally optional. Feel free to use them if you’d like.
 To qualify, the app must include:
 
 Drawing screen with:
-  - A basic drawing tool (pencil or brush)
-  - Color selection (predefined colors)
-  - Clear canvas option
-  - Save option (file export or in-app gallery)
-  - Undo/redo (at least one step back/forward)
+
+- A basic drawing tool (pencil or brush)
+- Color selection (predefined colors)
+- Clear canvas option
+- Save option (file export or in-app gallery)
+- Undo/redo (at least one step back/forward)
 
 ---
 
@@ -47,7 +48,8 @@ To go beyond the basics, the app can include:
 
 The prize will be randomly assigned in a raffle. To qualify, you need to share a post on **ANY social media**. We will collect all submissions via **Google Form** — please share the link to your social media post [HERE](https://forms.gle/tvzQswk6524W2zA37)!
 
-### What to share: 
+### What to share:
+
 Share what you built during the workshop (a live link or a short video). Use the hashtag **#FlutterVibesOnly** and tag Fluttercon (for example, on X: @FlutterconWorld).
 
 Tagging us is not required, but if you want, you can tag us with X handles **@ivannahere** & **@esratech** or LinkedIn handles [evanca](https://linkedin.com/in/evanca) & [esratech](https://linkedin.com/in/esratech).
@@ -60,7 +62,7 @@ We advise sharing a **live app link or a video**. In case you absolutely cannot 
 
 You can submit up until **30 minutes after the workshop is over**. For example, if the workshop ends at **17:20 AM**, you can still submit your app until **17:50 AM**.
 
-As long as your app meets the minimal requirements, you’ll be entered into the raffle! Depending on other submissions, we may also include apps that aren’t fully finished, so we encourage everyone to share what you’ve built—even if you’re not sure it qualifies (yes, even a red error screen counts, as it shows how far your AI assistant got with the task — just be sure to mention which model failed for you). 
+As long as your app meets the minimal requirements, you’ll be entered into the raffle! Depending on other submissions, we may also include apps that aren’t fully finished, so we encourage everyone to share what you’ve built—even if you’re not sure it qualifies (yes, even a red error screen counts, as it shows how far your AI assistant got with the task — just be sure to mention which model failed for you).
 
 ---
 
@@ -72,6 +74,7 @@ We recommend using **Firebase Hosting** for Flutter web apps:
 👉 https://firebase.google.com/docs/hosting/quickstart
 
 Your app should:
+
 - Be publicly accessible (no login or permissions required)
 - Include all required features
 - Work in a modern browser (Chrome, Edge, etc.)
@@ -83,12 +86,14 @@ Your app should:
 If you decide not to deploy a live link, simply record your screen and share the video on social media. You do **NOT** need a professional video with cool visuals, voiceovers, etc. Just grab a screen recording and you are good!
 
 #### 💻 On Mac
+
 1. Press **Command + Shift + 5**
 2. Select **"Record Entire Screen"** or **"Record Selected Portion"**
 3. Click **Record**
 4. Press **Command + Control + Esc** to stop recording
 
 #### 🖥️ On Windows
+
 1. Press **Windows + G** to open the Xbox Game Bar
 2. Click **Capture** > **Start Recording**
 3. Use **Windows + Alt + R** to stop recording
@@ -109,4 +114,45 @@ Workshop organisers reserve the right to share **screenshots, clips, or videos**
 
 ## Attribution
 
-All asset images included in this repository were created by Ivanna Kaceviča. You are welcome to use them for hackathon and project demo purposes!  
+All asset images included in this repository were created by Ivanna Kaceviča. You are welcome to use them for hackathon and project demo purposes!
+
+## Deploying to Netlify
+
+This repo includes a `netlify.toml` and a build script at `scripts/build_web.sh` for Flutter Web deployment.
+
+### Quick Steps
+
+1. Ensure the script is executable locally (Netlify respects the file mode):
+   ```
+   chmod +x scripts/build_web.sh
+   ```
+2. Commit & push the script and `netlify.toml`.
+3. In Netlify: New Site > Import from Git.
+4. Build command: leave blank (specified in `netlify.toml`) or set to `bash scripts/build_web.sh`.
+5. Publish directory: `build/web`.
+6. Deploy.
+
+### What the Script Does
+
+- Enables web (idempotent).
+- Fetches packages.
+- Builds release web bundle with the default renderer.
+
+### SPA Routing
+
+`netlify.toml` includes a catch‑all redirect to `/index.html` so deep links still work after a page refresh.
+
+### Troubleshooting
+
+| Issue             | Resolution                                                  |
+| ----------------- | ----------------------------------------------------------- |
+| Flutter not found | Add a pre-build step in Netlify UI to install Flutter.      |
+| 404 on deep link  | Ensure `netlify.toml` was committed; redirect rule present. |
+| Stale assets      | Flutter fingerprints files; force reload / clear cache.     |
+
+### Future Enhancements
+
+- Add `_headers` for caching or security (CSP, COOP/COEP) if needed.
+- Add a tiny smoke test via a Netlify plugin.
+
+Happy vibing & painting! 🖌️

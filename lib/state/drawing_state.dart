@@ -11,6 +11,7 @@ import '../tools/bucket_tool.dart';
 import '../tools/eraser_tool.dart';
 import '../tools/eyedropper_tool.dart';
 import '../tools/pencil_tool.dart';
+import '../tools/shape_tool.dart';
 import '../tools/tool.dart';
 
 /// Manages the collection of finalized strokes and an in‑progress stroke.
@@ -24,6 +25,7 @@ class DrawingState extends ChangeNotifier {
           EraserTool(),
           EyedropperTool(),
           BucketTool(),
+          ShapeTool(),
         ];
     for (final t in defaultTools) {
       _toolRegistry[t.type] = t;
@@ -33,6 +35,32 @@ class DrawingState extends ChangeNotifier {
   final List<Stroke> _strokes = [];
   final List<Stroke> _redo = [];
   Stroke? _inProgress;
+  // Shape preview (A3): transient metadata while dragging a shape.
+  ShapeMeta? _previewShape;
+  ShapeType _selectedShapeType = ShapeType.rectangle; // default shape
+  bool _constrainShape = false; // Shift key constraint flag
+
+  ShapeMeta? get previewShape => _previewShape;
+  ShapeType get selectedShapeType => _selectedShapeType;
+  bool get constrainShape => _constrainShape;
+
+  void setSelectedShapeType(ShapeType type) {
+    if (type == _selectedShapeType) return;
+    _selectedShapeType = type;
+    notifyListeners();
+  }
+
+  void setConstrainShape(bool value) {
+    if (value == _constrainShape) return;
+    _constrainShape = value;
+    // If currently previewing a shape, re-run update to reflect constraint.
+    final meta = _previewShape;
+    if (meta != null) {
+      updateShape(meta.end, force: true);
+    } else {
+      notifyListeners();
+    }
+  }
 
   // Active drawing attributes (FR-08, FR-10)
   Color _currentColor = const Color(0xFF000000);
@@ -108,6 +136,67 @@ class DrawingState extends ChangeNotifier {
   void handlePointerEnd() {
     final tool = activeToolInstance;
     tool?.onEnd(this);
+  }
+
+  // --- Shape specific helpers ---
+  void beginShape(Offset start) {
+    _previewShape =
+        ShapeMeta(type: _selectedShapeType, start: start, end: start);
+    notifyListeners();
+  }
+
+  void updateShape(Offset current,
+      {bool constrainProportions = false, bool force = false}) {
+    final prev = _previewShape;
+    if (prev == null) return;
+    var end = current;
+    final applyConstraint = constrainProportions || _constrainShape;
+    if (applyConstraint &&
+        (prev.type == ShapeType.rectangle || prev.type == ShapeType.circle)) {
+      final dx = current.dx - prev.start.dx;
+      final dy = current.dy - prev.start.dy;
+      final size = dx.abs() > dy.abs() ? dx : dy;
+      end = Offset(prev.start.dx + size, prev.start.dy + size);
+    }
+    if (!force && prev.end == end) return;
+    _previewShape = ShapeMeta(type: prev.type, start: prev.start, end: end);
+    notifyListeners();
+  }
+
+  void cancelShape() {
+    if (_previewShape == null) return;
+    _previewShape = null;
+    notifyListeners();
+  }
+
+  void commitShape() {
+    final meta = _previewShape;
+    if (meta == null) return;
+    final distance = (meta.end - meta.start).distance;
+    ShapeMeta commitMeta = meta;
+    if (distance < 0.5) {
+      final adjustedEnd = meta.start + const Offset(0.5, 0.5);
+      commitMeta =
+          ShapeMeta(type: meta.type, start: meta.start, end: adjustedEnd);
+    }
+    final shapeStroke = Stroke(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      color: _currentColor,
+      width: _currentWidth,
+      points: const [],
+      toolType: ToolType.shape,
+      timestamp: DateTime.now(),
+      shapeMeta: commitMeta,
+    );
+    _strokes.add(shapeStroke);
+    _redo.clear();
+    _strokeCount++;
+    _previewShape = null;
+    dev.log(
+        'shape_committed type=${shapeStroke.shapeMeta!.type.name} total=$_strokeCount',
+        name: 'drawing');
+    _invalidateSampleCache();
+    notifyListeners();
   }
 
   /// Attach the canvas boundary key so pixel sampling can snapshot.

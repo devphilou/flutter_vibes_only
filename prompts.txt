@@ -70,3 +70,19 @@ Okay, go further with Pixel-level sampling (render RepaintBoundary.toImage() and
 Something seems to went wrong with the latest changes: Now when I use the eyedropper it has no color at all.
 -
 I still get the same issue. So before it worked. No again I select the eyedropper, I before used the brushed to for example to make a stroke in blue and the eyedropper is not recognizing the blue color.
+---
+Okay, what would be the next step according to the #file:ADVANCED_PLAN.md ?
+-
+Okay, start with the 1. step according to your Suggested Implementation Sequence.
+-
+Proceed directly with painter changes (Step 2).
+-
+Yes, directly proceed with step 3
+-
+Do all of your suggestions
+-
+Yes, please do Optional Improvements 1. to 5.
+-
+If I want to deploy this project to my netlify, what do I need to do?
+-
+The bucket tool feature is not implemented yet in the free drawing section. Please disable the related button as long as the feature is not fully working

@@ -1,0 +1,29 @@
+[build]
+  publish = "build/web"
+  command = "bash scripts/build_web.sh"
+
+[build.environment]
+  # Pin a Flutter version via FVM or environment if needed; can also rely on default image.
+  # Example (uncomment if you add a .nvmrc / FVM config):
+  # FLUTTER_VERSION = "3.24.0"
+
+[[redirects]]
+  from = "/free"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/gallery"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/coloring"
+  to = "/index.html"
+  status = 200
+
+# Fallback catch-all for SPA routes (go_router) — must be last.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -18,6 +18,7 @@ class ToolSelector extends StatelessWidget {
         ToolType.eraser => Icons.auto_fix_normal, // Placeholder icon
         ToolType.eyedropper => Icons.colorize,
         ToolType.bucket => Icons.format_color_fill,
+        ToolType.shape => Icons.crop_square,
       };
 
   String _label(ToolType t) => switch (t) {
@@ -26,6 +27,7 @@ class ToolSelector extends StatelessWidget {
         ToolType.eraser => 'Eraser',
         ToolType.eyedropper => 'Eyedropper',
         ToolType.bucket => 'Bucket',
+        ToolType.shape => 'Shape',
       };
 
   @override
@@ -33,6 +35,15 @@ class ToolSelector extends StatelessWidget {
     return AnimatedBuilder(
       animation: state,
       builder: (context, _) {
+        // Temporary: bucket tool not yet implemented in free drawing.
+        // If it somehow became active (e.g., programmatically), revert to pencil.
+        if (state.activeTool == ToolType.bucket) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.activeTool == ToolType.bucket) {
+              state.setActiveTool(ToolType.pencil);
+            }
+          });
+        }
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -41,32 +52,46 @@ class ToolSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Semantics(
                   button: true,
+                  enabled: tool != ToolType.bucket,
                   selected: state.activeTool == tool,
-                  label: _label(tool),
+                  label: tool == ToolType.bucket
+                      ? '${_label(tool)} (coming soon)'
+                      : _label(tool),
                   child: Tooltip(
-                    message: _label(tool),
+                    message: tool == ToolType.bucket
+                        ? '${_label(tool)} – coming soon'
+                        : _label(tool),
                     child: InkWell(
-                      onTap: () => state.setActiveTool(tool),
+                      onTap: tool == ToolType.bucket
+                          ? null
+                          : () => state.setActiveTool(tool),
                       borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: state.activeTool == tool
-                              ? Theme.of(context).colorScheme.primaryContainer
-                              : Theme.of(context).colorScheme.surfaceVariant,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
+                      child: Opacity(
+                        opacity: tool == ToolType.bucket ? 0.45 : 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: state.activeTool == tool
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : Theme.of(context).colorScheme.surfaceVariant,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: state.activeTool == tool
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: Icon(
+                            _icon(tool),
+                            size: 20,
                             color: state.activeTool == tool
                                 ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.outlineVariant,
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                           ),
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        child: Icon(
-                          _icon(tool),
-                          size: 20,
-                          color: state.activeTool == tool
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
