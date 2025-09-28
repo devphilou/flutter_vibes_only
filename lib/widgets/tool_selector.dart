@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../assets/app_assets.dart';
 import '../models/stroke.dart';
 import '../state/drawing_state.dart';
+import 'app_asset_icon.dart';
 
 /// Horizontal tool selector (radio-style semantics) for A2 core tools.
 class ToolSelector extends StatelessWidget {
@@ -12,13 +14,14 @@ class ToolSelector extends StatelessWidget {
   // Available tools now driven by DrawingState registry so selector updates
   // automatically if tools are injected differently (testing / feature flags).
 
-  IconData _icon(ToolType t) => switch (t) {
-        ToolType.pencil => Icons.edit,
-        ToolType.brush => Icons.brush,
-        ToolType.eraser => Icons.auto_fix_normal, // Placeholder icon
-        ToolType.eyedropper => Icons.colorize,
-        ToolType.bucket => Icons.format_color_fill,
-        ToolType.shape => Icons.crop_square,
+  // Map to asset paths for custom icons.
+  String? _assetFor(ToolType t) => switch (t) {
+        ToolType.pencil => AppAssets.pencil,
+        ToolType.brush => AppAssets.paintBrush,
+        ToolType.eraser => AppAssets.eraser,
+        ToolType.eyedropper => AppAssets.eyedropper,
+        ToolType.bucket => AppAssets.bucket,
+        ToolType.shape => null, // Shape tool soon can reflect selected shape.
       };
 
   String _label(ToolType t) => switch (t) {
@@ -83,15 +86,7 @@ class ToolSelector extends StatelessWidget {
                             ),
                           ),
                           padding: const EdgeInsets.all(12),
-                          child: Icon(
-                            _icon(tool),
-                            size: 20,
-                            color: state.activeTool == tool
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                          ),
+                          child: _buildIcon(context, tool),
                         ),
                       ),
                     ),
@@ -101,6 +96,30 @@ class ToolSelector extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildIcon(BuildContext context, ToolType tool) {
+    final asset = _assetFor(tool);
+    final colorScheme = Theme.of(context).colorScheme;
+    final selected = state.activeTool == tool;
+    if (asset != null) {
+      // Preserve original multi-color asset; adjust selection via background +
+      // slight opacity only (no color tint) so the icon isn't monochrome.
+      return Opacity(
+        opacity: selected ? 1.0 : 0.85,
+        child: AppAssetIcon(
+          asset,
+          size: 24,
+          semanticLabel: _label(tool),
+        ),
+      );
+    }
+    // For shape tool, show a simple stacked icon group or fallback Material icon.
+    return Icon(
+      Icons.category_outlined,
+      size: 22,
+      color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
     );
   }
 }
