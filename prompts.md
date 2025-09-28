@@ -110,3 +110,13 @@
 - Okay, we are doing better. But the Icons in the buttons are still not like in the image. It seems the buttons are only showing the shape of the image but not the image itself with the actual coloring.
 - Okay, I like it. Only thing: Do not use the brush set icon for the save functionality. Use the icon you used before.
 - Okay on the start screen you can remove the title saying "paint vibes only" because we now use the logo which is enough. Furthermore, please use the autumn image as a background on the start screen.
+
+---
+
+22. Okay, let us continue with the open points of the #file:ADVANCED_PLAN.md at Phase A3. On the current state, we need some adjustment: the shapes are currently controlled but just one button and afterwards we can use the shortcuts for line, rectangle, circle, wave preview. What I would like to have is some dedicated button control over the specific shapes. So on the top layer we still have the unified button for shapes but when clicking on that we will get addtional buttons (you decided on the design, for example if it is a dropdown or a second button row or [what is best practice out there?]). The new buttons should use the icons I attached. It think only for the line shape icon you need to get creative. And by the way: the shortcuts (L/R/C/W) to control the selected shape can stay as a nice to have feature.
+
+- Hm, I still do not see the icons you implemented. When I click on the shape button I can do squares and of course the key shortcuts are working but no new buttons for specific shapes.
+- Where should I see the submenu for the shaped tools? I still cannot see it
+- I attached an image to the current view. As you may see, there is still no submenu even I selected the main shape tool button.
+- Okay, I managed once to see them. But they are not shown reliably. It was by luck because I opened the browser's developer tools.
+- Please fix the tool selector. The submenu for the shaped tools is only shown when I resize the window which seems to trigger a rebuild. When I click on the shape tool button I cannot see the sebmenu initially.

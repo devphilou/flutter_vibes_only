@@ -167,55 +167,61 @@ class _FreeDrawScreenState extends State<FreeDrawScreen> {
                   if (_loading) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  return Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DrawingToolbar(
-                            state: _drawingState,
-                            canvasBoundaryKey: _canvasKey,
-                          ),
-                        ),
-                        if (_drawingState.activeTool == ToolType.shape)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: _ShapeTypeBar(state: _drawingState),
-                          ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                minWidth: 300,
-                                minHeight: 300,
-                                maxWidth: 1200,
+                  return AnimatedBuilder(
+                    animation: _drawingState,
+                    builder: (context, _) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DrawingToolbar(
+                                state: _drawingState,
+                                canvasBoundaryKey: _canvasKey,
                               ),
-                              child: AspectRatio(
-                                aspectRatio: 4 / 3,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
-                                    border: Border.all(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outlineVariant,
-                                    ),
+                            ),
+                            if (_drawingState.activeTool == ToolType.shape)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: _ShapeTypeBar(state: _drawingState),
+                              ),
+                            const SizedBox(height: 16),
+                            Expanded(
+                              child: Center(
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    minWidth: 300,
+                                    minHeight: 300,
+                                    maxWidth: 1200,
                                   ),
-                                  child: DrawingCanvas(
-                                    state: _drawingState,
-                                    boundaryKey: _canvasKey,
+                                  child: AspectRatio(
+                                    aspectRatio: 4 / 3,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface,
+                                        border: Border.all(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant,
+                                        ),
+                                      ),
+                                      child: DrawingCanvas(
+                                        state: _drawingState,
+                                        boundaryKey: _canvasKey,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

@@ -5,7 +5,8 @@ import '../models/stroke.dart';
 import '../state/drawing_state.dart';
 import 'app_asset_icon.dart';
 
-/// Horizontal tool selector (radio-style semantics) for A2 core tools.
+/// Horizontal tool selector (no inline shape submenu). Shape variants are
+/// surfaced separately in `FreeDrawScreen` for reliability.
 class ToolSelector extends StatelessWidget {
   const ToolSelector({super.key, required this.state});
 
@@ -47,54 +48,16 @@ class ToolSelector extends StatelessWidget {
             }
           });
         }
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final tool in state.availableTools)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Semantics(
-                  button: true,
-                  enabled: tool != ToolType.bucket,
-                  selected: state.activeTool == tool,
-                  label: tool == ToolType.bucket
-                      ? '${_label(tool)} (coming soon)'
-                      : _label(tool),
-                  child: Tooltip(
-                    message: tool == ToolType.bucket
-                        ? '${_label(tool)} – coming soon'
-                        : _label(tool),
-                    child: InkWell(
-                      onTap: tool == ToolType.bucket
-                          ? null
-                          : () => state.setActiveTool(tool),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Opacity(
-                        opacity: tool == ToolType.bucket ? 0.45 : 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: state.activeTool == tool
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Theme.of(context).colorScheme.surfaceVariant,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: state.activeTool == tool
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .outlineVariant,
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(12),
-                          child: _buildIcon(context, tool),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
+        final toolButtons = <Widget>[];
+        for (final tool in state.availableTools) {
+          if (tool == ToolType.shape) {
+            // Single button representing shape tool; specific shape buttons shown elsewhere.
+            toolButtons.add(_shapePrimaryButton(context));
+          } else {
+            toolButtons.add(_toolButton(context, tool));
+          }
+        }
+        return Row(mainAxisSize: MainAxisSize.min, children: toolButtons);
       },
     );
   }
@@ -121,5 +84,103 @@ class ToolSelector extends StatelessWidget {
       size: 22,
       color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
     );
+  }
+
+  Widget _toolButton(BuildContext context, ToolType tool) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Semantics(
+        button: true,
+        enabled: tool != ToolType.bucket,
+        selected: state.activeTool == tool,
+        label: tool == ToolType.bucket
+            ? '${_label(tool)} (coming soon)'
+            : _label(tool),
+        child: Tooltip(
+          message: tool == ToolType.bucket
+              ? '${_label(tool)} – coming soon'
+              : _label(tool),
+          child: InkWell(
+            onTap: tool == ToolType.bucket
+                ? null
+                : () => state.setActiveTool(tool),
+            borderRadius: BorderRadius.circular(8),
+            child: Opacity(
+              opacity: tool == ToolType.bucket ? 0.45 : 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: state.activeTool == tool
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: state.activeTool == tool
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: _buildIcon(context, tool),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shapePrimaryButton(BuildContext context) {
+    final selected = state.activeTool == ToolType.shape;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: 'Shapes',
+        child: Tooltip(
+          message: selected ? 'Shapes (press L/R/C/W for shortcuts)' : 'Shapes',
+          child: InkWell(
+            onTap: () => state.setActiveTool(ToolType.shape),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: selected
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : Theme.of(context).colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: selected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
+              padding: const EdgeInsets.all(12),
+              child: _shapePrimaryIcon(context, selected),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shapePrimaryIcon(BuildContext context, bool selected) {
+    final cs = Theme.of(context).colorScheme;
+    final active = state.selectedShapeType;
+    Widget icon;
+    switch (active) {
+      case ShapeType.line:
+        icon = Icon(Icons.show_chart, size: 24, color: cs.primary);
+        break;
+      case ShapeType.rectangle:
+        icon = AppAssetIcon(AppAssets.squareShape, size: 24);
+        break;
+      case ShapeType.circle:
+        icon = AppAssetIcon(AppAssets.circleShape, size: 24);
+        break;
+      case ShapeType.wave:
+        icon = AppAssetIcon(AppAssets.waveShape, size: 24);
+        break;
+    }
+    return Opacity(opacity: selected ? 1 : 0.85, child: icon);
   }
 }

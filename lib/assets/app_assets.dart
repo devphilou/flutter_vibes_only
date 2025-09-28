@@ -15,6 +15,7 @@ abstract final class AppAssets {
   static const circleShape = '$root/circle_shape_icon.png';
   static const squareShape = '$root/square_shape_icon.png';
   static const waveShape = '$root/wave_line_icon.png';
+  // A simple generated line icon isn't present; we'll draw line symbol in code.
   static const autumn = '$root/autumn.png';
 
   // Coloring pages root (individual names may vary, keep directory accessible)
