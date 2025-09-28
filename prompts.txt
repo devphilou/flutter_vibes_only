@@ -86,3 +86,15 @@ Yes, please do Optional Improvements 1. to 5.
 If I want to deploy this project to my netlify, what do I need to do?
 -
 The bucket tool feature is not implemented yet in the free drawing section. Please disable the related button as long as the feature is not fully working
+---
+As you may see there are also some nice assets included in the project. Please use them where already suited.
+- [AFTER ERROR] -
+Hm, this is not working right now, I am getting these kind of errors in my app for all the image usages:
+-
+Still having the issues. Please fix them
+-
+Okay, we are doing better. But the Icons in the buttons are still not like in the image. It seems the buttons are only showing the shape of the image but not the image itself with the actual coloring.
+-
+Okay, I like it. Only thing: Do not use the brush set icon for the save functionality. Use the icon you used before.
+-
+Okay on the start screen you can remove the title saying "paint vibes only" because we now use the logo which is enough. Furthermore, please use the autumn image as a background on the start screen.
