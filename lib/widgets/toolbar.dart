@@ -59,6 +59,12 @@ class DrawingToolbar extends StatelessWidget {
                 colors: _palette,
                 selected: state.currentColor,
                 onSelected: state.setColor,
+                recentColors: state.recentColors,
+                onPickCustom: () async {
+                  final c =
+                      await _showSimpleColorDialog(context, state.currentColor);
+                  if (c != null) state.setColor(c);
+                },
               ),
               StrokeWidthSelector(
                 widths: _widths,
@@ -161,6 +167,72 @@ class DrawingToolbar extends StatelessWidget {
       },
     );
   }
+}
+
+Future<Color?> _showSimpleColorDialog(
+    BuildContext context, Color initial) async {
+  Color temp = initial;
+  return showDialog<Color>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Pick Color'),
+        content: SizedBox(
+          width: 240,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Slider(
+                value: temp.red.toDouble(),
+                max: 255,
+                label: 'R ${temp.red}',
+                onChanged: (v) {
+                  temp = temp.withRed(v.toInt());
+                  (context as Element).markNeedsBuild();
+                },
+              ),
+              Slider(
+                value: temp.green.toDouble(),
+                max: 255,
+                label: 'G ${temp.green}',
+                onChanged: (v) {
+                  temp = temp.withGreen(v.toInt());
+                  (context as Element).markNeedsBuild();
+                },
+              ),
+              Slider(
+                value: temp.blue.toDouble(),
+                max: 255,
+                label: 'B ${temp.blue}',
+                onChanged: (v) {
+                  temp = temp.withBlue(v.toInt());
+                  (context as Element).markNeedsBuild();
+                },
+              ),
+              Container(
+                width: 80,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: temp,
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(temp),
+            child: const Text('Select'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class _IconActionButton extends StatelessWidget {

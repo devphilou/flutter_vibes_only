@@ -14,6 +14,10 @@ import '../tools/pencil_tool.dart';
 import '../tools/shape_tool.dart';
 import '../tools/tool.dart';
 
+/// Brush rendering style variants (A4). Implemented minimally; used by
+/// painter/tools to adjust stroke characteristics.
+enum BrushStyle { standard, soft, calligraphic }
+
 /// Manages the collection of finalized strokes and an in‑progress stroke.
 class DrawingState extends ChangeNotifier {
   DrawingState({List<Tool>? tools}) {
@@ -65,6 +69,9 @@ class DrawingState extends ChangeNotifier {
   // Active drawing attributes (FR-08, FR-10)
   Color _currentColor = const Color(0xFF000000);
   double _currentWidth = 2.0;
+  // A4: advanced brush style & recent colors
+  BrushStyle _brushStyle = BrushStyle.standard;
+  final List<Color> _recentColors = [];
   ToolType _activeTool = ToolType.pencil;
   final Map<ToolType, Tool> _toolRegistry = {};
   ToolType? _previousToolBeforeEyedropper; // For auto-revert after pick.
@@ -86,6 +93,8 @@ class DrawingState extends ChangeNotifier {
 
   Color get currentColor => _currentColor;
   double get currentWidth => _currentWidth;
+  BrushStyle get brushStyle => _brushStyle;
+  List<Color> get recentColors => List.unmodifiable(_recentColors);
   ToolType get activeTool => _activeTool;
   Tool? get activeToolInstance => _toolRegistry[_activeTool];
   List<ToolType> get availableTools =>
@@ -295,6 +304,22 @@ class DrawingState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Mutates the in-progress stroke width (used by advanced brush styles)
+  /// while preserving immutability outward by recreating the Stroke.
+  void replaceInProgress({double? width}) {
+    final ip = _inProgress;
+    if (ip == null) return;
+    _inProgress = Stroke(
+      id: ip.id,
+      color: ip.color,
+      width: width ?? ip.width,
+      points: List.of(ip.points),
+      toolType: ip.toolType,
+      timestamp: ip.timestamp,
+    );
+    notifyListeners();
+  }
+
   /// Finalizes the in-progress stroke (or creates a dot stroke if tiny).
   void endStroke() {
     final stroke = _inProgress;
@@ -365,6 +390,7 @@ class DrawingState extends ChangeNotifier {
   void setColor(Color color) {
     if (color == _currentColor) return;
     _currentColor = color;
+    _addRecentColor(color);
     dev.log('color_changed value=${color.value.toRadixString(16)}',
         name: 'drawing');
     notifyListeners();
@@ -376,6 +402,22 @@ class DrawingState extends ChangeNotifier {
     _currentWidth = width;
     dev.log('width_changed value=$width', name: 'drawing');
     notifyListeners();
+  }
+
+  void setBrushStyle(BrushStyle style) {
+    if (style == _brushStyle) return;
+    _brushStyle = style;
+    dev.log('brush_style_changed value=${style.name}', name: 'drawing');
+    notifyListeners();
+  }
+
+  void _addRecentColor(Color c) {
+    // Maintain at most 8 entries, most-recent first, unique by ARGB value.
+    _recentColors.removeWhere((e) => e.value == c.value);
+    _recentColors.insert(0, c);
+    if (_recentColors.length > 8) {
+      _recentColors.removeRange(8, _recentColors.length);
+    }
   }
 
   /// Sets the active tool (A2 multi-tool support).

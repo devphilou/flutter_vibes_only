@@ -124,3 +124,14 @@
 ---
 
 23. Alright, check on Phase A3. Is everything done or are there still open points? If there are still open points then tackle them!
+
+---
+
+24. Proceed with Phase A4 and do all of the tasks to complete A4 at once!
+
+- If I got it correctly, the options Std, Soft and Calli are for the Brush, right?
+- Yes, I would like to go with 3., i.e. if any other tool is selected than the brush then hide the style options for the brush. You can do it in a similar way like it was done with the options for the shape tool (line, wave, circle, rectangle).
+- Please show the options below the main toolbar.
+- Align the style of the option button for the different shape styles with the button style of the brush style options.
+- The canvas is always adjusting in size a soon as a second option toolbar is show like for the shapes and the brush.
+  Fix this behavior regarding best practice for responsiveness.

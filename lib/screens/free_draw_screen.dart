@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../assets/app_assets.dart';
 import '../main.dart';
 import '../models/drawing_document.dart';
 import '../models/stroke.dart';
 import '../repository/drawing_repository.dart';
 import '../state/drawing_state.dart';
+import '../widgets/app_asset_icon.dart';
+import '../widgets/brush_style_selector.dart';
 import '../widgets/drawing_canvas.dart';
 import '../widgets/toolbar.dart';
 
@@ -182,11 +185,28 @@ class _FreeDrawScreenState extends State<FreeDrawScreen> {
                                 canvasBoundaryKey: _canvasKey,
                               ),
                             ),
-                            if (_drawingState.activeTool == ToolType.shape)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: _ShapeTypeBar(state: _drawingState),
+                            const SizedBox(height: 8),
+                            // Fixed-height option bar to avoid canvas resize jumps
+                            SizedBox(
+                              height:
+                                  56, // aligns with 48 min control + padding
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 180),
+                                switchInCurve: Curves.easeOut,
+                                switchOutCurve: Curves.easeIn,
+                                layoutBuilder:
+                                    (currentChild, previousChildren) {
+                                  return Stack(
+                                    alignment: Alignment.centerLeft,
+                                    children: [
+                                      ...previousChildren,
+                                      if (currentChild != null) currentChild,
+                                    ],
+                                  );
+                                },
+                                child: _buildOptionsBarContent(_drawingState),
                               ),
+                            ),
                             const SizedBox(height: 16),
                             Expanded(
                               child: Center(
@@ -231,6 +251,25 @@ class _FreeDrawScreenState extends State<FreeDrawScreen> {
       ),
     );
   }
+
+  Widget _buildOptionsBarContent(DrawingState state) {
+    // Show appropriate secondary option controls; keep empty box otherwise.
+    if (state.activeTool == ToolType.shape) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        key: const ValueKey('shape-options'),
+        child: _ShapeTypeOptions(state: state),
+      );
+    }
+    if (state.activeTool == ToolType.brush) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        key: const ValueKey('brush-options'),
+        child: BrushStyleSelector(state: state),
+      );
+    }
+    return const SizedBox(key: ValueKey('empty-options'));
+  }
 }
 
 // Intents for keyboard shape selection and cancel.
@@ -247,43 +286,116 @@ class _CycleShapeIntent extends Intent {
   const _CycleShapeIntent();
 }
 
-// Inline shape type bar displayed when shape tool active.
-class _ShapeTypeBar extends StatelessWidget {
-  const _ShapeTypeBar({required this.state});
+// Shape type options row (used in reserved secondary bar)
+class _ShapeTypeOptions extends StatelessWidget {
+  const _ShapeTypeOptions({required this.state});
   final DrawingState state;
 
   @override
-  Widget build(BuildContext context) {
-    final shapes = ShapeType.values;
-    return AnimatedBuilder(
-      animation: state,
-      builder: (context, _) {
-        return Row(
-          children: [
-            for (final s in shapes)
-              Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: ChoiceChip(
-                  label: Text(_label(s)),
-                  selected: state.selectedShapeType == s,
-                  onSelected: (_) {
-                    state.setActiveTool(ToolType.shape);
-                    state.setSelectedShapeType(s);
-                  },
-                ),
+  Widget build(BuildContext context) => Row(
+        children: [
+          for (final s in ShapeType.values)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: _ShapeTypeChip(
+                type: s,
+                selected: state.selectedShapeType == s,
+                onTap: () {
+                  state.setActiveTool(ToolType.shape);
+                  state.setSelectedShapeType(s);
+                },
               ),
-          ],
-        );
-      },
-    );
-  }
+            ),
+        ],
+      );
+}
 
-  String _label(ShapeType t) => switch (t) {
+class _ShapeTypeChip extends StatelessWidget {
+  const _ShapeTypeChip({
+    required this.type,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final ShapeType type;
+  final bool selected;
+  final VoidCallback onTap;
+
+  String get _label => switch (type) {
         ShapeType.line => 'Line',
-        ShapeType.rectangle => 'Rect',
+        ShapeType.rectangle => 'Rectangle',
         ShapeType.circle => 'Circle',
         ShapeType.wave => 'Wave',
       };
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final bg = selected ? cs.primaryContainer : cs.surfaceVariant;
+    final borderColor = selected ? cs.primary : cs.outlineVariant;
+    final fg = selected ? cs.onPrimaryContainer : cs.onSurface;
+    final semanticsLabel = 'Shape ${_label}${selected ? ' (selected)' : ''}';
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
+      selected: selected,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: borderColor),
+          ),
+          child: Center(child: _icon(context, fg)),
+        ),
+      ),
+    );
+  }
+
+  Widget _icon(BuildContext context, Color fg) {
+    switch (type) {
+      case ShapeType.rectangle:
+        return AppAssetIcon(AppAssets.squareShape,
+            size: 24, semanticLabel: _label);
+      case ShapeType.circle:
+        return AppAssetIcon(AppAssets.circleShape,
+            size: 24, semanticLabel: _label);
+      case ShapeType.wave:
+        return AppAssetIcon(AppAssets.waveShape,
+            size: 24, semanticLabel: _label);
+      case ShapeType.line:
+        // Simple drawn line since we have no asset for it.
+        return SizedBox(
+          width: 32,
+          height: 24,
+          child: CustomPaint(
+            painter: _LineIconPainter(color: fg),
+          ),
+        );
+    }
+  }
+}
+
+class _LineIconPainter extends CustomPainter {
+  const _LineIconPainter({required this.color});
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(
+        Offset(2, size.height - 2), Offset(size.width - 2, 2), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _LineIconPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _UndoIntent extends Intent {
