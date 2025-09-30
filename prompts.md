@@ -120,3 +120,7 @@
 - I attached an image to the current view. As you may see, there is still no submenu even I selected the main shape tool button.
 - Okay, I managed once to see them. But they are not shown reliably. It was by luck because I opened the browser's developer tools.
 - Please fix the tool selector. The submenu for the shaped tools is only shown when I resize the window which seems to trigger a rebuild. When I click on the shape tool button I cannot see the sebmenu initially.
+
+---
+
+23. Alright, check on Phase A3. Is everything done or are there still open points? If there are still open points then tackle them!
